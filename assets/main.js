@@ -387,6 +387,33 @@
     });
   }
 
+  // „Kennenlerngespräch buchen“: Am großen Bildschirm öffnet sich die Buchungsseite von Google in einem Dialog.
+  // Der Rahmen wird erst beim ersten Klick geladen – vorher geht nichts an Google.
+  // Auf dem Handy (und ohne <dialog>) bleibt es beim Link in einem neuen Tab.
+  const buchen = document.querySelector('[data-buchen]');
+  const platzGenug = matchMedia('(min-width: 48rem) and (min-height: 34rem)');
+  if (buchen && typeof HTMLDialogElement === 'function') {
+    let buchung = null;
+    buchen.addEventListener('click', (e) => {
+      if (!platzGenug.matches || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();
+      if (!buchung) {
+        buchung = document.createElement('dialog');
+        buchung.className = 'raster buchung';
+        buchung.setAttribute('aria-label', 'Kennenlerngespräch buchen');
+        buchung.innerHTML = '<div class="raster__kopf"><h2>Kennenlerngespräch buchen</h2><form method="dialog"><button class="raster__zu">Schließen</button></form></div>';
+        const rahmen = document.createElement('iframe');
+        rahmen.className = 'buchung__rahmen';
+        rahmen.title = 'Terminbuchung über Google Kalender';
+        rahmen.src = buchen.href + '?gv=true';
+        buchung.append(rahmen);
+        document.body.append(buchung);
+        buchung.addEventListener('click', (ev) => { if (ev.target === buchung) buchung.close(); });
+      }
+      buchung.showModal();
+    });
+  }
+
   const jahr = document.querySelector('[data-jahr]');
   if (jahr) jahr.textContent = new Date().getFullYear();
 })();
