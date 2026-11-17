@@ -1,0 +1,4 @@
+# Arbeitsmaterial und lokale Einstellungen gehören nicht auf die veröffentlichte Seite
+_quellen/
+.claude/
+.DS_Store

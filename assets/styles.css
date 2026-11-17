@@ -1,0 +1,734 @@
+/* Till Börner – Filmproduktion
+   Farbwelt aus dem betterVIDEOS Corporate Design: Dunkelblau, Drachenfrucht Pink, Hellblau, Grau. */
+
+/* Schriften liegen lokal – keine Verbindung zu Google.
+   Gloock: Überschriften · Albert Sans: Text und Bedienung · Big Shoulders Display: nur der Stempel */
+@font-face {
+  font-family: 'Albert Sans';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/albert-sans-italic-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Albert Sans';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/albert-sans-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Albert Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/albert-sans-normal-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Albert Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("fonts/albert-sans-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Gloock';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/gloock-normal-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Gloock';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/gloock-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+  src: url("fonts/big-shoulders-display-normal-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* betterVIDEOS-Farbwelt. Die Namen beschreiben die Rolle, nicht den Farbton:
+     So lässt sich die ganze Farbwelt an dieser einen Stelle austauschen. */
+  --grund: #0c253d;       /* Seitenhintergrund */
+  --flaeche: #123250;     /* abgesetzte Abschnitte und Flächen */
+  --linie: #2a4a69;       /* Trennlinien */
+  --schrift: #f0f1f1;     /* Text – und als Fläche die umgekehrte Szene (Garantie) */
+  --leise: #b1b4b8;       /* Nebentext */
+  --akzent: #f95758;      /* Drachenfrucht Pink: Knöpfe und Hervorhebungen */
+  --zweit: #90c4de;       /* Hellblau: leise Hervorhebungen im Text */
+  --orange: #fd8c04;      /* Orange: dritter Akzent, sparsam */
+  --auf-akzent: #0c253d;  /* Text auf Akzentflächen */
+  --auf-bild: #f0f1f1;    /* Text auf Fotos, Videos und Schwarz */
+  --schwarz: #000;        /* Logo-Band, Fuß, Videoflächen */
+  --stempel: #f95758;     /* Stempelfarbe */
+  --schatten: 4 14 26;    /* dunkler Verlauf über Bildern, als RGB-Kanäle */
+  /* dieselben Farben als Kanäle, für Transparenzen: rgb(var(--grund-rgb) / 0.8) läuft in jedem Browser */
+  --grund-rgb: 12 37 61;
+  --schrift-rgb: 240 241 241;
+  --linie-rgb: 42 74 105;
+
+  --display: "Gloock", Georgia, "Times New Roman", serif;  /* große Überschriften */
+  --ui: "Albert Sans", "Helvetica Neue", Arial, sans-serif;    /* Navigation, Knöpfe, kleine Überschriften */
+  --text: "Albert Sans", "Helvetica Neue", Arial, sans-serif;
+  --stempelschrift: "Big Shoulders Display", "Arial Narrow", sans-serif;
+
+  --rand: clamp(1.125rem, 4vw, 4rem);
+  --abstand: clamp(4.5rem, 11vw, 10rem);
+  --kopf: 4.5rem;
+  --rund: clamp(1rem, 1.6vw, 1.5rem);  /* Rundung für Flächen und Bilder */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-padding-top: calc(var(--kopf) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+/* Weiches Scrollen schaltet main.js erst nach dem Laden ein. Direktaufrufe wie /#filme
+   landen so sofort am Ziel, statt beim Laden die halbe Seite hinunterzufahren. */
+html.weich { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--grund);
+  color: var(--schrift);
+  font-family: var(--text);
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Filmkorn über der Seite – kaum sichtbar, aber es nimmt den Flächen das Digitale.
+   Kopfzeile (110) und Player (101) liegen darüber: auf Tills Filmen hat fremdes Korn nichts verloren. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+img { display: block; max-width: 100%; height: auto; }
+/* <picture> soll im Layout nicht existieren: Das <img> verhält sich wie ein direktes Kind,
+   und <source> darf in Rastern und Flexboxen keinen Platz belegen. */
+picture { display: contents; }
+picture > source { display: none; }
+a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-color: var(--akzent); }
+p { margin: 0 0 1em; max-width: 62ch; }
+p, li { text-wrap: pretty; }
+figure { margin: 0; }
+p:last-child { margin-bottom: 0; }
+h1, h2, h3 { margin: 0; font-weight: 800; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+:focus-visible { outline: 2px solid var(--akzent); outline-offset: 3px; border-radius: 2px; }
+/* In beschnittenen Rahmen sitzt der Fokusring innen, sonst schneidet overflow ihn ab. */
+.poster:focus-visible, .film:focus-visible, .clip:focus-visible, .programm__rolle:focus-visible { outline-offset: -4px; }
+::selection { background: var(--akzent); color: var(--grund); }
+
+.skip {
+  position: absolute; left: var(--rand); top: -4rem; z-index: 200;
+  background: var(--akzent); color: var(--auf-akzent); padding: 0.5rem 1rem;
+  font-family: var(--ui); font-weight: 700; text-decoration: none;
+}
+.skip:focus { top: 0.75rem; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mit-abstand { margin-top: 1.75rem; }
+
+.wrap { padding-inline: var(--rand); max-width: 110rem; margin-inline: auto; }
+.sec { padding-block: var(--abstand); }
+
+/* Plakat-Überschrift: die eine laute Stimme der Seite */
+.titel {
+  font-family: var(--display);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(2.75rem, 7.4vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  max-width: 16ch;
+}
+.titel--breit { max-width: 22ch; }
+.titel--klein { font-size: clamp(2.25rem, 4.6vw, 4.5rem); }
+
+.gross { font-size: clamp(1.35rem, 2.1vw, 1.875rem); line-height: 1.38; max-width: 34ch; text-wrap: balance; }
+.kursiv { font-style: italic; }
+.leise { color: var(--leise); }
+.klein { font-size: 0.9375rem; line-height: 1.5; }
+@media (max-width: 34rem) {
+  p, li { hyphens: auto; hyphenate-limit-chars: 8 4 4; }
+  /* Große Sätze, Zitate, Namen und Filmtitel werden nie automatisch getrennt */
+  .gross, .play, .film, .clip__name { hyphens: manual; }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.6em;
+  font-family: var(--ui); font-weight: 800; font-size: 1.25rem; letter-spacing: 0.02em;
+  line-height: 1; text-decoration: none; white-space: nowrap;
+  padding: 0.85em 1.5em; border-radius: 999px;
+  background: var(--akzent); color: var(--auf-akzent);
+  border: 1.5px solid var(--akzent);
+  transition: background-color 0.18s, color 0.18s, border-color 0.18s;
+}
+.btn:hover { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
+.btn--linie { background: transparent; color: var(--schrift); border-color: rgb(var(--schrift-rgb) / 0.45); }
+.btn--linie:hover { background: var(--schrift); color: var(--grund); }
+.btn--kompakt { font-size: 1.0625rem; padding: 0.6em 1.1em; }
+.btn svg { width: 1em; height: 1em; flex: none; }
+.btnreihe { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* ───────── Kopf ───────── */
+.kopf {
+  position: sticky; top: 0; z-index: 110;
+  height: var(--kopf);
+  background: rgb(var(--grund-rgb) / 0.82);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid rgb(var(--linie-rgb) / 0.6);
+}
+.kopf__innen { height: 100%; display: flex; align-items: center; gap: 1.5rem; }
+.marke { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; margin-right: auto; }
+/* Das Logo ist eine Maske und nimmt die Textfarbe an – so passt es zu jeder Farbwelt. */
+.marke__logo {
+  flex: none; width: 2.49rem; height: 2.4rem; background: currentColor;
+  -webkit-mask: url("img/tb-logo.webp") center / contain no-repeat; mask: url("img/tb-logo.webp") center / contain no-repeat;
+}
+.marke__name { font-family: var(--ui); font-weight: 800; font-size: 1.375rem; letter-spacing: 0.02em; line-height: 1; white-space: nowrap; }
+.marke__zusatz { display: block; font-family: var(--text); font-weight: 400; font-style: italic; font-size: 0.875rem; letter-spacing: 0; color: var(--leise); margin-top: 0.2em; }
+.nav { display: flex; gap: clamp(1rem, 2vw, 2rem); }
+.nav a { font-family: var(--ui); font-weight: 700; font-size: 1.1875rem; letter-spacing: 0.03em; text-decoration: none; padding-block: 0.4rem; border-bottom: 2px solid transparent; }
+.nav a:hover, .nav a[aria-current="true"] { border-bottom-color: var(--akzent); }
+.kopf__aktion { display: flex; gap: 0.5rem; }
+
+.menue { display: none; }
+@media (max-width: 62rem) {
+  .kopf__innen { gap: 0.5rem; }
+  .menue {
+    display: inline-flex; align-items: center; gap: 0.55em; order: 3;
+    font-family: var(--ui); font-weight: 800; font-size: 1.0625rem; letter-spacing: 0.02em; line-height: 1;
+    padding: 0.6em 0.2em 0.6em 0.6em;
+  }
+  .menue::after {
+    content: ""; width: 1.15rem; height: 0.7rem;
+    background: linear-gradient(currentColor 0 0) top / 100% 2px no-repeat, linear-gradient(currentColor 0 0) bottom / 100% 2px no-repeat;
+    transition: height 0.2s;
+  }
+  .menue[aria-expanded="true"]::after { height: 2px; }
+  .nav {
+    position: absolute; left: 0; right: 0; top: 100%;
+    flex-direction: column; gap: 0;
+    padding: 0.5rem var(--rand) 1.25rem;
+    background: var(--grund); border-bottom: 1px solid var(--linie);
+    visibility: hidden; opacity: 0; translate: 0 -0.5rem;
+    transition: opacity 0.2s, translate 0.2s, visibility 0s 0.2s;
+  }
+  .kopf[data-offen] .nav { visibility: visible; opacity: 1; translate: 0; transition-delay: 0s; }
+  .nav a { font-size: 1.75rem; padding-block: 0.7rem; border-bottom: 1px solid var(--linie); }
+  .nav a:hover, .nav a[aria-current="true"] { border-bottom-color: var(--linie); color: var(--akzent); }
+}
+@media (max-width: 34rem) {
+  .marke__zusatz { display: none; }
+  .kopf__aktion .btn--linie { display: none; }
+  .kopf__ruf span { display: none; }
+  .kopf__ruf { padding: 0.7em; font-size: 1.125rem; }
+}
+
+/* ───────── Hero ─────────
+   Das Showreel läuft bildfüllend im Hintergrund, Titel und Knöpfe liegen unten links darüber.
+   z-index 101: über dem Filmkorn (100), unter der Kopfzeile (110). */
+.hero {
+  position: relative; z-index: 101; isolation: isolate; overflow: hidden;
+  display: grid; align-items: end;
+  min-height: calc(100svh - var(--kopf));
+  background: var(--schwarz); color: var(--auf-bild);
+}
+.hero__film { position: absolute; inset: 0; z-index: -2; container-type: size; overflow: hidden; }
+.hero__film img { width: 100%; height: 100%; object-fit: cover; }
+/* Der Vimeo-Player deckt die Fläche wie object-fit: cover. */
+.hero__film iframe {
+  position: absolute; top: 50%; left: 50%; translate: -50% -50%; scale: 1.02;
+  width: max(100cqw, 177.78cqh); height: max(100cqh, 56.25cqw);
+  border: 0; pointer-events: none; opacity: 0; transition: opacity 1.4s;
+}
+.hero__film iframe.laeuft { opacity: 1; }
+/* Verlauf, damit Titel und Knöpfe vor jedem Bild lesbar bleiben */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(to top, rgb(var(--schatten) / 0.94), rgb(var(--schatten) / 0.6) 34%, rgb(var(--schatten) / 0.1) 68%, rgb(var(--schatten) / 0.28));
+}
+.hero__inhalt { width: 100%; padding-block: clamp(4.5rem, 9svh, 7rem) clamp(2.25rem, 4.5vw, 4.5rem); }
+.hero__titel {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(3.5rem, min(10.6vw, 17svh), 12rem);
+  line-height: 1.02; letter-spacing: -0.02em;
+  margin-bottom: 0.14em;
+  pointer-events: none;
+}
+/* Jede Zeile ist ein Fenster, aus dem der Text beim Laden hochfährt. clip-path mit negativem Inset
+   lässt Ober- und Unterlängen frei und funktioniert auch in Safari (overflow-clip-margin nicht). */
+.hero__titel span { display: block; clip-path: inset(-0.14em -1em); }
+.hero__titel i { display: block; font-style: normal; }
+/* Optischer Randausgleich: In der Gloock ragt das y nach links aus seiner Zeile, T und S sitzen leicht eingerückt.
+   Die Werte gleichen das aus, damit T, y und S auf einer Achse stehen (gemessen an den Buchstabenkanten). */
+.hero__titel span:nth-child(1) i { margin-left: -0.01em; }
+.hero__titel span:nth-child(2) i { margin-left: 0.05em; }
+.hero__titel span:nth-child(3) i { margin-left: -0.028em; }
+.hero__text { max-width: 38rem; }
+.hero__text .gross { margin-bottom: 1.5rem; }
+.hero .btn--linie { border-color: rgb(var(--schrift-rgb) / 0.6); background: rgb(var(--schatten) / 0.25); }
+
+/* Ein orchestrierter Moment: Der Titel fährt hoch, der Text blendet ein. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__titel i { animation: hoch 0.95s cubic-bezier(0.2, 0.8, 0.15, 1) both; }
+  .hero__titel span:nth-child(2) i { animation-delay: 0.09s; }
+  .hero__titel span:nth-child(3) i { animation-delay: 0.18s; }
+  .hero__text { animation: ein 0.8s ease-out 0.75s both; }
+}
+@keyframes hoch { from { translate: 0 130%; } }
+@keyframes ein { from { opacity: 0; } }
+
+@media (max-width: 52rem) {
+  .hero__titel { font-size: clamp(3.2rem, min(15.4vw, 8.2svh), 7rem); }
+}
+
+/* ───────── Kunden ───────── */
+.kunden { background: var(--schwarz); color: var(--auf-bild); padding-block: 2.25rem 2.5rem; overflow: hidden; }
+.kunden__kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.kunden__kopf h2 { font-family: var(--ui); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.02em; }
+.band { display: flex; width: max-content; gap: clamp(0.25rem, 1vw, 1rem); }
+.band ul { display: flex; gap: clamp(0.25rem, 1vw, 1rem); flex: none; }
+/* Die Logos sind vorab aufbereitet (_quellen/logos-aufbereiten.py): einfarbig, transparent,
+   alle auf derselben Fläche und optisch gleich schwer. Hier wird nur noch gesetzt. */
+.band img { width: clamp(8.5rem, 13vw, 12.5rem); aspect-ratio: 9 / 5; opacity: 0.84; transition: opacity 0.25s, scale 0.3s cubic-bezier(0.2, 0.8, 0.15, 1); }
+/* Das Band läuft immer durch; wer über ein Logo fährt, sieht es etwas größer. */
+.band li:hover img { opacity: 1; scale: 1.14; }
+.kunden__lauf { mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+@media (prefers-reduced-motion: no-preference) {
+  .band.laeuft { animation: lauf 70s linear infinite; }
+  .band.laeuft.gegen { animation-direction: reverse; animation-duration: 84s; }
+}
+@keyframes lauf { to { translate: calc(-50% - clamp(0.125rem, 0.5vw, 0.5rem)) 0; } }
+.band:not(.laeuft) { width: auto; overflow-x: auto; }
+
+/* ───────── Manifest ─────────
+   Links die Ansage: „packen“ in Pink, „einschläfern“ durchgestrichen, darunter die pinke Fläche.
+   Rechts sieht man Till zum ersten Mal, seine Mission steht als Zitat unter dem Bild. */
+.manifest__raster { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto; gap: 1.5rem clamp(2rem, 5vw, 5rem); }
+.manifest__text, .manifest__weiter { grid-column: 1; }
+.manifest__till { grid-column: 2; grid-row: 1 / span 2; }
+/* Die linke Spalte gibt die Höhe vor; rechts füllt das Foto, was über dem Zitat frei bleibt.
+   So schließen pinke Fläche und Zitat unten gemeinsam ab, ohne Leerraum dazwischen. */
+.manifest__text { display: grid; gap: clamp(1.75rem, 3vw, 2.75rem); align-content: start; }
+.titel.manifest__titel { font-size: clamp(2.8rem, 8.2vw, 8.6rem); line-height: 1.04; max-width: 12ch; }
+.manifest__titel em { font-style: normal; color: var(--akzent); }
+.manifest__titel s { color: var(--leise); text-decoration-line: line-through; text-decoration-color: var(--akzent); text-decoration-thickness: 0.07em; }
+.manifest__los {
+  margin: 0; max-width: none; padding: clamp(1.5rem, 3vw, 2.75rem); border-radius: var(--rund);
+  background: var(--akzent); color: var(--auf-akzent);
+  font-family: var(--ui); font-weight: 600; font-size: clamp(1.25rem, 2vw, 1.75rem); line-height: 1.32; text-wrap: pretty;
+}
+.manifest__los strong { display: block; margin-top: 0.7em; font-weight: 700; }
+.manifest__till { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: clamp(1.25rem, 2.4vw, 2rem); }
+.manifest__foto { position: relative; min-height: clamp(16rem, 24vw, 24rem); border-radius: var(--rund); overflow: hidden; background: var(--flaeche); }
+.manifest__bild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.zitat { margin: 0; padding-left: clamp(1.1rem, 2vw, 1.6rem); border-left: 3px solid var(--akzent); }
+.zitat blockquote { margin: 0; }
+.zitat p { margin: 0; max-width: none; font-family: var(--display); font-weight: 400; font-size: clamp(1.5rem, 2.3vw, 2.125rem); line-height: 1.22; text-wrap: balance; }
+.zitat p::before { content: "„"; }
+.zitat p::after { content: "“"; }
+.zitat figcaption { margin-top: 0.9rem; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; letter-spacing: 0.01em; color: var(--leise); }
+.zitat figcaption::before { content: "– "; }
+.manifest__weiter { margin: 0; }
+.wort--pink { color: var(--akzent); }
+.wort--blau { color: var(--zweit); }
+.wort--orange { color: var(--orange); }
+@media (max-width: 52rem) {
+  .manifest__raster { grid-template-columns: minmax(0, 1fr); }
+  .manifest__till { grid-column: 1; grid-row: auto; grid-template-rows: auto; }
+  .manifest__foto { aspect-ratio: 1 / 1; min-height: 0; }
+}
+
+/* ───────── Ablauf ─────────
+   Jeder Schritt hat seine Farbe aus dem Corporate Design: Pink, Hellblau, Orange. Das Bild steht fest daneben. */
+.ablauf { background: var(--flaeche); }
+.ablauf__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3rem 1.5rem; align-items: start; }
+.ablauf__bild { grid-column: 1 / 5; aspect-ratio: 3 / 4; overflow: hidden; }
+.ablauf__bild img { width: 100%; height: 100%; object-fit: cover; }
+.ablauf__inhalt { grid-column: 6 / 13; }
+.schritte { margin-top: clamp(2rem, 4vw, 3.5rem); counter-reset: schritt; display: grid; gap: 0.75rem; }
+.schritte li {
+  counter-increment: schritt;
+  display: grid; grid-template-columns: clamp(3.25rem, 6vw, 5.25rem) minmax(0, 1fr); column-gap: 1.5rem; align-items: center;
+  padding: clamp(1.25rem, 2.2vw, 1.9rem) clamp(1.25rem, 2.4vw, 2.25rem);
+  background: rgb(var(--grund-rgb) / 0.6); border-left: 5px solid var(--farbe);
+}
+.schritte li:nth-child(1) { --farbe: var(--akzent); }
+.schritte li:nth-child(2) { --farbe: var(--zweit); }
+.schritte li:nth-child(3) { --farbe: var(--orange); }
+.schritte li::before {
+  content: counter(schritt);
+  font-family: var(--display); font-weight: 400; font-size: clamp(3.25rem, 6vw, 5.25rem); line-height: 0.85;
+  color: var(--farbe);
+}
+.schritte h3 { font-family: var(--ui); font-weight: 600; font-size: clamp(1.3rem, 1.9vw, 1.625rem); line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 0.4rem; }
+.schritte p { max-width: 46ch; }
+.ablauf__schluss { margin-top: clamp(1.5rem, 2.6vw, 2.25rem); max-width: none; }
+@media (max-width: 52rem) {
+  .ablauf__bild { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+  .ablauf__bild img { object-position: 50% 22%; }
+  .ablauf__inhalt { grid-column: 1 / -1; }
+}
+
+/* ───────── Filme ───────── */
+.filme__kopf { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem; margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+.filme__wahl { display: grid; gap: 0.9rem; justify-items: start; max-width: 38ch; }
+.filme__wahl p { margin: 0; }
+
+/* Überblick: die Projekte als Raster in einem Dialog, die Kacheln ploppen nacheinander auf.
+   Solange ein Dialog offen ist, lässt sich die Seite dahinter nicht scrollen. */
+html:has(dialog[open]) { overflow: hidden; }
+.raster { overflow-y: auto; overscroll-behavior: contain; border: 0; padding: clamp(1.25rem, 3vw, 2.5rem); width: min(74rem, 100vw - 2rem); max-height: min(52rem, 100svh - 2rem); background: var(--grund); color: var(--schrift); box-shadow: 0 0 0 1px var(--linie), 0 2rem 5rem rgb(var(--schatten) / 0.6); }
+.raster::backdrop { background: rgb(var(--schatten) / 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.raster__kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+.raster__kopf h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.75rem, 3vw, 2.5rem); line-height: 1.1; }
+.raster__zu { font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; padding: 0.3rem 0; }
+.raster__zu:hover { color: var(--akzent); }
+.raster__liste { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem 0.75rem; }
+.raster__film { display: block; width: 100%; text-align: left; }
+.raster__film span { display: block; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--schwarz); }
+.raster__film img { width: 100%; height: 100%; object-fit: cover; transition: scale 0.4s cubic-bezier(0.2, 0.8, 0.15, 1); }
+.raster__film:hover img, .raster__film:focus-visible img { scale: 1.06; }
+.raster__film b { display: block; margin-top: 0.5rem; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; line-height: 1.25; }
+.raster__film:hover b { color: var(--akzent); }
+@media (prefers-reduced-motion: no-preference) {
+  .raster[open] { animation: plopp 0.32s cubic-bezier(0.2, 1.2, 0.3, 1) both; }
+  .raster[open] .raster__liste li { animation: plopp 0.42s cubic-bezier(0.2, 1.3, 0.3, 1) both; animation-delay: calc(var(--i) * 28ms + 80ms); }
+}
+@keyframes plopp { from { opacity: 0; scale: 0.9; } }
+@media (max-width: 62rem) { .raster__liste { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 34rem) { .raster__liste { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Die Bühne bestimmt die Zeilenhöhe; das Programm füllt sie aus und scrollt in sich. */
+.kino { display: grid; grid-template-columns: minmax(0, 2.15fr) minmax(17rem, 1fr); gap: 0.85rem 1.5rem; }
+.buehne { position: relative; z-index: 101; aspect-ratio: 16 / 9; background: var(--schwarz); overflow: hidden; }
+.buehne iframe, .clip iframe, .saal__bild iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.poster { position: absolute; inset: 0; width: 100%; height: 100%; display: block; text-decoration: none; color: var(--auf-bild); }
+.poster img { width: 100%; height: 100%; object-fit: cover; transition: scale 0.6s cubic-bezier(0.2, 0.8, 0.15, 1), opacity 0.3s; }
+.poster:hover img { scale: 1.025; }
+.poster::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgb(var(--schatten) / 0.72), transparent 45%); }
+.play {
+  position: absolute; left: clamp(1rem, 2.4vw, 2rem); bottom: clamp(1rem, 2.4vw, 2rem); z-index: 2;
+  display: flex; align-items: center; gap: 0.9rem; text-align: left;
+  font-family: var(--ui); font-weight: 800; font-size: clamp(1.25rem, 2vw, 1.75rem); letter-spacing: 0.02em; line-height: 1.05;
+}
+.play__knopf { flex: none; display: grid; place-items: center; width: clamp(3.25rem, 5vw, 4.5rem); aspect-ratio: 1; border-radius: 50%; background: var(--akzent); color: var(--auf-akzent); transition: scale 0.2s; }
+.poster:hover .play__knopf { scale: 1.08; }
+.play__knopf svg { width: 38%; margin-left: 8%; }
+.play small { display: block; font-family: var(--text); font-weight: 400; font-style: italic; font-size: 0.9375rem; letter-spacing: 0; color: inherit; opacity: 0.85; margin-top: 0.2rem; }
+.buehne__hinweis { grid-column: 1; max-width: none; }
+
+.programm { position: relative; min-height: 0; }
+.programm__rolle {
+  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--leise) transparent;
+  padding: 0 0.5rem 3.5rem 0;
+  mask-image: linear-gradient(#000 calc(100% - 4rem), transparent);
+}
+.programm__rolle[data-ende] { mask-image: none; }
+.programm h3 { font-family: var(--ui); font-weight: 800; font-size: 1.1875rem; letter-spacing: 0.03em; color: var(--leise); padding-block: 0 0.6rem; }
+.programm ul + h3 { margin-top: 1.75rem; }
+.film {
+  display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) auto; gap: 0.9rem; align-items: center;
+  width: 100%; text-align: left; text-decoration: none; padding: 0.55rem 0.6rem; border-top: 1px solid var(--linie);
+  position: relative; transition: background-color 0.15s, box-shadow 0.15s;
+}
+.film img { width: 6.5rem; aspect-ratio: 16 / 9; object-fit: cover; background: var(--flaeche); }
+.film__name { font-family: var(--ui); font-weight: 800; font-size: 1.25rem; line-height: 1.05; letter-spacing: 0.01em; }
+.film__art { display: block; font-family: var(--text); font-weight: 400; font-style: italic; font-size: 0.9375rem; color: var(--leise); margin-top: 0.15rem; }
+.film__zeit { font-family: var(--ui); font-weight: 700; font-size: 1.0625rem; color: var(--leise); }
+.film:hover { background: var(--flaeche); }
+.film[aria-current="true"] { background: var(--flaeche); box-shadow: inset 3px 0 0 var(--akzent); }
+.film[aria-current="true"] .film__zeit { color: var(--zweit); }
+
+@media (max-width: 62rem) {
+  .kino { grid-template-columns: minmax(0, 1fr); }
+  .buehne__hinweis { grid-row: 2; margin-bottom: 1rem; }
+  .programm__rolle { position: static; overflow: visible; padding: 0; mask-image: none; }
+}
+
+/* ───────── Hochformat ───────── */
+.hoch { background: var(--flaeche); }
+.hoch__kopf { display: grid; gap: clamp(1.25rem, 2.4vw, 2rem); margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+.hoch__kopf .titel { max-width: 19ch; font-size: clamp(2.2rem, 4.5vw, 4.6rem); }
+/* Links Titel und Versprechen, rechts die drei Orte als kleines Plakat */
+.hoch__kopf { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: end; column-gap: clamp(2rem, 5vw, 5rem); }
+.hoch__kopf .titel, .hoch__los { grid-column: 1; }
+.hoch__los { margin: 0; max-width: 30ch; }
+.hoch__orte { grid-column: 2; grid-row: 1 / span 2; margin: 0; max-width: none; padding-left: clamp(1.25rem, 2.4vw, 2rem); border-left: 1px solid var(--linie); }
+.hoch__orte > span { display: block; }
+.hoch__ob { font-family: var(--ui); font-weight: 600; font-size: 1.0625rem; color: var(--leise); margin-bottom: 0.35rem; }
+.hoch__ort { font-family: var(--display); font-weight: 400; font-size: clamp(1.9rem, 3.4vw, 3.4rem); line-height: 1.08; }
+.hoch__ort small { font-family: var(--ui); font-weight: 600; font-size: 1.0625rem; color: var(--leise); vertical-align: 0.35em; }
+.hoch__fazit { margin-top: 0.9rem; max-width: 26ch; font-size: clamp(1.0625rem, 1.4vw, 1.25rem); line-height: 1.4; }
+@media (max-width: 52rem) {
+  .hoch__kopf { grid-template-columns: minmax(0, 1fr); }
+  .hoch__orte { grid-column: 1; grid-row: auto; }
+}
+.reels { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.75rem; }
+.clip { position: relative; z-index: 101; display: block; width: 100%; background: var(--schwarz); overflow: hidden; text-decoration: none; }
+.clip--hoch { aspect-ratio: 9 / 16; }
+.clip--quer { aspect-ratio: 16 / 9; }
+.clip .play { font-size: 1.25rem; left: 0.9rem; bottom: 0.9rem; right: 0.9rem; gap: 0.7rem; }
+.clip .play__knopf { width: 2.75rem; }
+.clip .play small { font-size: 0.875rem; }
+.hoch__fuss { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; }
+@media (max-width: 62rem) {
+  .reels { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: min(62vw, 15rem); overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(-1 * var(--rand)); padding-inline: var(--rand); scroll-padding-inline: var(--rand); scrollbar-width: none; }
+  .reels > li { scroll-snap-align: start; }
+}
+
+/* ───────── Kundenstimmen ─────────
+   Oben die echten Google-Bewertungen (Elfsight-Widget), darunter die Video-Stimmen als Mosaik:
+   zwei Hochformate außen, sechs Querformate in der Mitte. */
+/* Die einfliegenden Kacheln starten knapp außerhalb – der Abschnitt schneidet sie ab, damit die Seite nicht seitlich scrollt. */
+.stimmen { overflow-x: clip; }
+.stimmen__kopf { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.25rem 2rem; }
+.bewertungen { margin-top: clamp(2rem, 4vw, 3.5rem); min-height: 12rem; }
+/* Das Widget setzt gleich hohe Zeilen: neben einer langen Bewertung bleibt eine kurze als fast leerer Kasten stehen.
+   main.js misst jede Karte und gibt ihr so viele 4-px-Zeilen, wie sie braucht (Klasse „mauer“).
+   Die nächste Karte rückt dann direkt darunter auf; Spaltenzahl und Reihenfolge bestimmt weiter das Widget. */
+.bewertungen.mauer .es-grid-layout { grid-auto-rows: 4px !important; grid-template-rows: none !important; row-gap: 0 !important; align-items: start !important; }
+.mosaik { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.5rem 0.75rem; margin-top: clamp(2rem, 4vw, 3.5rem); }
+.mosaik__hoch { grid-row: 1 / 3; display: grid; }
+.mosaik__hoch--links { grid-column: 1; }
+.mosaik__hoch--rechts { grid-column: 5; }
+.mosaik__hoch .clip--hoch { aspect-ratio: auto; height: 100%; min-height: 18rem; }
+/* Querformat: Name steht unter dem Bild, weil die Vorschaubilder schon Bauchbinden tragen */
+.mosaik .clip--quer .poster::after { background: none; }
+.mosaik .clip--quer .play { inset: 0.7rem auto auto 0.7rem; }
+.mosaik .clip--quer .play__knopf { width: 2.25rem; }
+.clip__name { margin-top: 0.6rem; font-family: var(--ui); font-weight: 600; font-size: 1rem; line-height: 1.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.6rem; max-width: none; }
+.clip__name span { font-family: var(--text); font-weight: 400; font-style: italic; font-size: 0.875rem; color: var(--leise); letter-spacing: 0; }
+@media (max-width: 62rem) {
+  .mosaik { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mosaik__hoch { grid-row: auto; grid-column: auto; order: 2; }
+  .mosaik__hoch .clip--hoch { aspect-ratio: 9 / 16; height: auto; min-height: 0; }
+}
+@media (max-width: 34rem) {
+  .mosaik li:not(.mosaik__hoch) { grid-column: 1 / -1; }
+}
+/* Einflug: Die Stimmen kommen abwechselnd von links und rechts herein, sobald sie sichtbar werden.
+   Die Klasse .flug setzt main.js – ohne JavaScript bleibt alles einfach sichtbar. */
+@media (prefers-reduced-motion: no-preference) {
+  .flug { opacity: 0; translate: var(--von, -2.5rem) 0; transition: opacity 0.6s ease-out, translate 0.7s cubic-bezier(0.2, 0.8, 0.15, 1); transition-delay: calc(var(--i, 0) * 70ms); }
+  .flug.da { opacity: 1; translate: 0; }
+}
+
+/* Kinosaal: Reels und Kundenstimmen laufen auf großen Bildschirmen in einem Dialog statt in der kleinen Kachel */
+.saal { border: 0; padding: 0; background: transparent; color: var(--auf-bild); max-width: none; max-height: none; overflow: visible; }
+.saal::backdrop { background: rgb(var(--schatten) / 0.88); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.saal__bild { position: relative; background: var(--schwarz); }
+.saal__bild--hoch { height: min(84svh, 60rem); aspect-ratio: 9 / 16; }
+.saal__bild--quer { width: min(86vw, 139svh, 90rem); aspect-ratio: 16 / 9; }
+.saal__zu { position: absolute; right: 0; bottom: calc(100% + 0.6rem); font-family: var(--ui); font-weight: 800; font-size: 1.125rem; letter-spacing: 0.03em; padding: 0.3rem 0; }
+.saal__zu:hover { color: var(--akzent); }
+
+/* ───────── Garantie (helle Szene) ───────── */
+.garantie { background: var(--schrift); color: var(--grund); }
+.garantie ::selection { background: var(--grund); color: var(--schrift); }
+.garantie__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; align-items: start; }
+.garantie__kopf { grid-column: 1 / 9; }
+.garantie__kopf .gross { margin-bottom: 1.25rem; max-width: 40ch; }
+.garantie .titel { font-size: clamp(3rem, 7.4vw, 7.5rem); max-width: 18ch; }
+.stempel { grid-column: 9 / 13; justify-self: end; width: min(100%, 21rem); rotate: -11deg; color: var(--stempel); margin-top: 1rem; }
+.stempel text { font-family: var(--stempelschrift); font-weight: 800; fill: currentColor; }
+.stempel .stempel__wort { font-weight: 900; fill: var(--schrift); }
+.garantie__text { grid-column: 1 / 13; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.5rem; border-top: 1.5px solid var(--grund); padding-top: 2rem; }
+.garantie__text > div:first-child { grid-column: 1 / 6; }
+.garantie__text > div:last-child { grid-column: 7 / 13; }
+.garantie .btn { background: var(--grund); color: var(--schrift); border-color: var(--grund); }
+.garantie .btn:hover { background: transparent; border-color: var(--grund); color: var(--grund); }
+.garantie :focus-visible { outline-color: var(--grund); }
+@media (max-width: 52rem) {
+  .garantie__kopf, .garantie__text > div:first-child, .garantie__text > div:last-child { grid-column: 1 / -1; }
+  .stempel { grid-column: 1 / -1; justify-self: start; width: 13rem; margin: 0 0 0 0.5rem; }
+}
+
+/* ───────── Nächster Schritt ───────── */
+.schritt__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; }
+.schritt__kopf { grid-column: 1 / 10; }
+.schritt__frage { margin-bottom: 1rem; }
+.schritt__zusatz { margin-top: 1.5rem; color: var(--zweit); }
+.schritt__text { grid-column: 1 / 6; }
+.faelle { grid-column: 7 / 13; display: grid; gap: 0; align-content: start; }
+.faelle div { border-top: 1px solid var(--linie); padding-block: 1.25rem 1.5rem; }
+.faelle h3 { font-family: var(--ui); font-weight: 800; font-size: 1.625rem; letter-spacing: 0.01em; line-height: 1.1; margin-bottom: 0.4rem; }
+.einblicke { grid-column: 1 / -1; display: grid; grid-template-columns: 1.5fr 1.2fr 1.4fr; gap: 0.75rem; margin-top: 1rem; }
+.einblicke img { width: 100%; height: clamp(11rem, 26vw, 24rem); object-fit: cover; }
+@media (max-width: 52rem) {
+  .schritt__kopf, .schritt__text, .faelle { grid-column: 1 / -1; }
+  .einblicke { grid-template-columns: 1fr 1fr; }
+  .einblicke picture:first-child img { grid-column: 1 / -1; }
+}
+
+/* ───────── Fragen ───────── */
+.fragen { background: var(--flaeche); }
+.fragen__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; align-items: start; }
+.fragen__kopf { grid-column: 1 / 6; position: sticky; top: calc(var(--kopf) + 2rem); }
+.fragen__kopf .gross { margin-top: 1rem; }
+.portraet { display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; }
+.portraet img { width: 5.5rem; height: 5.5rem; border-radius: 50%; object-fit: cover; }
+.portraet p { font-size: 1rem; line-height: 1.4; }
+.fragen__liste { grid-column: 6 / 13; }
+.frage { border-top: 1px solid var(--linie); }
+.frage:last-child { border-bottom: 1px solid var(--linie); }
+.frage summary {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: center;
+  list-style: none; cursor: pointer; padding-block: 1.1rem;
+  font-family: var(--ui); font-weight: 800; font-size: clamp(1.375rem, 2vw, 1.75rem); line-height: 1.1; letter-spacing: 0.01em;
+}
+.frage summary::-webkit-details-marker { display: none; }
+.frage summary::after {
+  content: ""; width: 1.1rem; height: 1.1rem; flex: none;
+  background: linear-gradient(currentColor 0 0) center / 100% 2px no-repeat, linear-gradient(currentColor 0 0) center / 2px 100% no-repeat;
+  transition: rotate 0.25s, color 0.2s;
+}
+.frage summary:hover { color: var(--akzent); }
+.frage[open] summary::after { rotate: 45deg; color: var(--akzent); }
+.frage__antwort { padding: 0 2.5rem 1.6rem 0; }
+.frage__antwort ul { margin: 0 0 1em; }
+.frage__antwort li { padding-left: 1.2em; position: relative; max-width: 60ch; }
+.frage__antwort li::before { content: "–"; position: absolute; left: 0; color: var(--akzent); }
+@media (max-width: 62rem) {
+  .fragen__kopf { grid-column: 1 / -1; position: static; }
+  .fragen__liste { grid-column: 1 / -1; }
+}
+
+/* ───────── Finale / Kontakt ─────────
+   Ruhiger Abschluss: links der Dank, rechts die Kontaktwege als schlichte Liste. */
+.finale { padding-bottom: clamp(3rem, 6vw, 5rem); }
+.finale__raster { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(2.5rem, 7vw, 7rem); align-items: start; }
+.titel.finale__titel { font-size: clamp(2rem, 3.4vw, 3.25rem); line-height: 1.1; max-width: 13ch; }
+.finale__text p { margin: 1.25rem 0 0; max-width: 34ch; font-size: 1.125rem; line-height: 1.55; color: var(--leise); }
+.finale__text .finale__gruss { color: var(--schrift); font-weight: 600; }
+.kontakt { margin: 0; border-top: 1px solid var(--linie); }
+.kontakt > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; padding-block: 1.1rem; border-bottom: 1px solid var(--linie); }
+.kontakt dt { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; letter-spacing: 0.01em; color: var(--leise); }
+.kontakt dd { margin: 0; font-size: 1.125rem; line-height: 1.45; }
+.kontakt address { font-style: normal; }
+.nummer { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1.1; white-space: nowrap; text-decoration: none; transition: color 0.2s; }
+.kontakt__ruf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 1.25rem; }
+.kopiere { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--leise); text-decoration: underline; text-decoration-color: var(--linie); text-underline-offset: 0.25em; }
+.kopiere:hover { color: var(--akzent); }
+
+/* Kontaktkarte am Anrufen-Knopf im Kopf (nur mit Maus; auf dem Handy wählt der Knopf direkt) */
+.rufkarte {
+  position: fixed; inset: auto; margin: 0; width: min(21rem, 100vw - 2rem); padding: 1.5rem;
+  border: 1px solid var(--linie); border-radius: var(--rund); background: var(--grund); color: var(--schrift);
+  box-shadow: 0 1.5rem 3.5rem rgb(var(--schatten) / 0.55);
+}
+.rufkarte__zeile { margin: 0; font-size: 0.9375rem; color: var(--leise); }
+.rufkarte__nummer { display: block; width: fit-content; margin: 0.3rem 0 1.1rem; font-family: var(--display); font-size: 2rem; line-height: 1.1; white-space: nowrap; text-decoration: none; }
+.rufkarte__nummer:hover { color: var(--akzent); }
+.rufkarte__wege { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid var(--linie); font-size: 0.9375rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .rufkarte:popover-open { transform-origin: top right; animation: plopp 0.22s cubic-bezier(0.2, 1.2, 0.3, 1) both; }
+}
+.nummer:hover { color: var(--akzent); }
+@media (max-width: 52rem) { .finale__raster { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 24rem) { .kontakt > div { grid-template-columns: 5.5rem minmax(0, 1fr); } }
+
+/* ───────── Fuß ───────── */
+.fuss { background: var(--schwarz); color: var(--auf-bild); padding-block: 1.75rem; font-size: 1rem; }
+.fuss__innen { display: flex; flex-wrap: wrap; gap: 0.75rem 2rem; align-items: center; justify-content: space-between; }
+.fuss nav { display: flex; flex-wrap: wrap; gap: 0 1.75rem; }
+.fuss a { text-decoration: none; padding-block: 0.6rem; }
+.fuss a:hover { text-decoration: underline; }
+
+/* ───────── Unterseiten (Impressum, Datenschutz, Links) ───────── */
+.seite { padding-block: clamp(3rem, 7vw, 6rem) var(--abstand); }
+.seite .titel { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+.prosa { max-width: 44rem; }
+.prosa h2 { font-family: var(--ui); font-weight: 800; font-size: 1.75rem; letter-spacing: 0.01em; line-height: 1.1; margin: 2.5rem 0 0.6rem; padding-top: 1.25rem; border-top: 1px solid var(--linie); }
+.prosa h2:first-child { margin-top: 0; }
+.prosa strong { font-weight: 400; color: var(--akzent); }
+.prosa__kurz { margin-bottom: 2.5rem; }
+.prosa__stand { margin-top: 2.5rem; }
+
+.linkliste { display: grid; gap: 0.75rem; max-width: 30rem; margin-top: 2rem; }
+.linkliste .btn { justify-content: space-between; font-size: 1.5rem; padding: 1em 1.4em; }
+.linkseite { min-height: calc(100svh - var(--kopf)); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; align-items: center; padding-block: 3rem; }
+.linkseite__inhalt { grid-column: 1 / 8; }
+.linkseite__zusatz { margin-top: 1rem; }
+.linkseite__bild { grid-column: 9 / 13; aspect-ratio: 2 / 3; overflow: hidden; }
+.linkseite__bild img { width: 100%; height: 100%; object-fit: cover; }
+.linkseite dl { margin: 2.5rem 0 0; display: grid; gap: 1rem; }
+.linkseite dt { font-family: var(--ui); font-weight: 800; letter-spacing: 0.03em; color: var(--leise); font-size: 1.0625rem; }
+.linkseite dd { margin: 0; font-size: 1.25rem; }
+@media (max-width: 52rem) {
+  .linkseite__inhalt { grid-column: 1 / -1; }
+  .linkseite__bild { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.weich { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* ═════════ Schriftsatz: Gloock und Albert Sans ═════════
+   Die Größen weiter oben stammen aus dem ersten Entwurf mit schmaler Plakatschrift.
+   Dieser Abschnitt stimmt Titel, Bedienung und Text auf die normal breiten Schriften ab. */
+body { font-size: 1.0625rem; line-height: 1.62; }
+.gross { font-size: clamp(1.25rem, 1.75vw, 1.625rem); line-height: 1.42; }
+.klein { font-size: 0.875rem; }
+
+.titel { font-weight: 400; text-transform: none; font-size: clamp(2.4rem, 5.3vw, 5.5rem); line-height: 1.07; letter-spacing: -0.015em; max-width: 16ch; }
+.titel--breit { max-width: 22ch; }
+.titel--klein { font-size: clamp(1.9rem, 3.5vw, 3.6rem); }
+.garantie .titel { font-size: clamp(2.4rem, 5.4vw, 5.6rem); max-width: 17ch; }
+
+.btn { font-size: 1rem; font-weight: 600; letter-spacing: 0; padding: 0.95em 1.5em; }
+.btn--kompakt { font-size: 0.9375rem; padding: 0.7em 1.15em; }
+.marke__name { font-size: 1.125rem; font-weight: 700; letter-spacing: 0; }
+.marke__zusatz { font-size: 0.8125rem; }
+.nav a, .menue, .saal__zu { font-size: 0.9375rem; font-weight: 600; letter-spacing: 0; }
+.kunden__kopf h2 { font-size: 1.0625rem; font-weight: 600; letter-spacing: 0; }
+.play { font-size: clamp(1.0625rem, 1.5vw, 1.375rem); font-weight: 600; letter-spacing: -0.005em; line-height: 1.15; }
+.clip .play { font-size: 1rem; }
+.programm h3, .linkseite dt { font-size: 0.875rem; font-weight: 600; letter-spacing: 0.01em; }
+.film__name { font-size: 1rem; font-weight: 600; letter-spacing: 0; line-height: 1.2; overflow-wrap: break-word; min-width: 0; }
+.film__art { font-size: 0.875rem; }
+.film__zeit { font-size: 0.875rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.faelle h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+.frage summary { font-size: clamp(1.125rem, 1.45vw, 1.3125rem); font-weight: 600; letter-spacing: -0.005em; line-height: 1.25; padding-block: 1.25rem; }
+.prosa h2 { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; }
+.portraet p, .fuss { font-size: 0.9375rem; }
+@media (max-width: 62rem) {
+  .nav a { font-size: 1.5rem; }
+}
+@media (max-width: 34rem) {
+  .kopf__ruf { padding: 0.75em; }
+  .hero .btn { font-size: 0.9375rem; padding: 0.9em 1.25em; }
+}
