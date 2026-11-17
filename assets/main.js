@@ -387,15 +387,14 @@
     });
   }
 
-  // „Kennenlerngespräch buchen“: Am großen Bildschirm öffnet sich die Buchungsseite von Google in einem Dialog.
+  // „Kennenlerngespräch buchen“: Die Buchungsseite von Google öffnet sich in einem Dialog, am Handy bildschirmfüllend.
   // Der Rahmen wird erst beim ersten Klick geladen – vorher geht nichts an Google.
-  // Auf dem Handy (und ohne <dialog>) bleibt es beim Link in einem neuen Tab.
+  // Ohne <dialog> bleibt es beim Link in einem neuen Tab.
   const buchen = document.querySelector('[data-buchen]');
-  const platzGenug = matchMedia('(min-width: 48rem) and (min-height: 34rem)');
   if (buchen && typeof HTMLDialogElement === 'function') {
     let buchung = null;
     buchen.addEventListener('click', (e) => {
-      if (!platzGenug.matches || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
       e.preventDefault();
       if (!buchung) {
         buchung = document.createElement('dialog');

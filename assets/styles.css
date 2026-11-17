@@ -413,6 +413,14 @@ html:has(dialog[open]) { overflow: hidden; }
 .raster__zu:hover { color: var(--akzent); }
 /* Terminbuchung: gleicher Dialog, darin die Buchungsseite von Google (hell, deshalb weißer Grund) */
 .buchung { width: min(64rem, 100vw - 2rem); max-height: calc(100svh - 2rem); }
+@media (max-width: 48rem) {
+  /* Handy: Der Dialog füllt den Bildschirm, der Kalender bekommt die ganze Höhe unter dem Kopf. */
+  .buchung { position: fixed; inset: 0; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 1rem 0.75rem 0; border-radius: 0; box-shadow: none; display: none; flex-direction: column; }
+  .buchung[open] { display: flex; }
+  .buchung .raster__kopf { align-items: center; margin-bottom: 0.75rem; padding-inline: 0.25rem; }
+  .buchung .raster__kopf h2 { font-size: 1.25rem; }
+  .buchung .buchung__rahmen { flex: 1; height: auto; min-height: 0; border-radius: 0; }
+}
 /* Der Inhalt kommt von Google und lässt sich nicht direkt gestalten. Deshalb wird der Rahmen als Ganzes umgefärbt:
    umkehren (Weiß wird Schwarz, Schrift hell), Farbton zurückdrehen (Blau bleibt Blau), dann aufhellend auf das Dunkelblau legen. */
 .buchung__rahmen { display: block; width: 100%; height: min(700px, 100svh - 9rem); border: 0; background: #fff; border-radius: calc(var(--rund) * 0.6); filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
