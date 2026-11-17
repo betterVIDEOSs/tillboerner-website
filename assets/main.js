@@ -498,7 +498,7 @@
         b.addEventListener('click', () => { stand.tag = t; stand.zeit = null; zeitWahl(); });
         liste.append(b);
       });
-      const teile = [el('p', 'termin__text', 'Ein erstes Gespräch am Telefon, unverbindlich, etwa 30 Minuten.'), liste];
+      const teile = [el('p', 'termin__text', 'Ein erstes Gespräch per Video über Google Meet, unverbindlich, etwa 30 Minuten.'), liste];
       if (meldung) teile.unshift(el('p', 'termin__meldung', meldung));
       zeige(1, 'Welcher Tag passt Ihnen?', teile);
     }
@@ -545,8 +545,8 @@
       const ab = el('button', 'btn', 'Termin buchen'); ab.type = 'submit';
       f.append(
         feld('name', 'Ihr Name', 'text', true, 'name'),
-        feld('telefon', 'Telefonnummer, unter der ich Sie anrufe', 'tel', true, 'tel'),
-        feld('email', 'E-Mail für die Terminbestätigung', 'email', true, 'email'),
+        feld('email', 'E-Mail für die Einladung mit dem Meet-Link', 'email', true, 'email'),
+        feld('telefon', 'Telefonnummer', 'tel', false, 'tel'),
         feld('nachricht', 'Worum geht es?', 'textarea', false),
         falle, recht, ab);
       f.addEventListener('submit', async (e) => {
@@ -557,7 +557,7 @@
         try {
           const r = await fetch(api, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(daten) });
           const j = await r.json();
-          if (j.ok) { stand.gebucht = true; fertig(daten.email); return; }
+          if (j.ok) { stand.gebucht = true; fertig(daten.email, j.meet); return; }
           if (j.grund === 'vergeben' && j.tage) {
             stand.tage = j.tage.filter((t) => t.zeiten && t.zeiten.length).slice(0, 5);
             stand.tag = null; stand.zeit = null;
@@ -574,12 +574,18 @@
       zeige(3, 'Wie erreiche ich Sie?', teile);
     }
 
-    function fertig(email) {
+    function fertig(email, meet) {
+      const link = el('p', 'termin__text');
+      if (meet && /^https:\/\/meet\.google\.com\//.test(meet)) {
+        const a = el('a', '', meet.replace('https://', '')); a.href = meet; a.target = '_blank'; a.rel = 'noopener';
+        link.append('Ihr Link zum Gespräch: ', a);
+      }
       const zu = el('button', 'btn btn--linie', 'Schließen'); zu.type = 'button';
       zu.addEventListener('click', () => d.close());
       zeige(0, 'Der Termin steht.', [
         el('p', 'termin__gross', `${lang(stand.tag.datum)}, ${stand.zeit} Uhr`),
-        el('p', 'termin__text', `Ich rufe Sie an. Die Bestätigung mit Kalendereintrag geht an ${email}.`),
+        el('p', 'termin__text', `Wir sprechen per Google Meet. Die Einladung mit dem Link ist unterwegs an ${email}.`),
+        link,
         el('p', 'termin__text termin__gruss', 'Ich freue mich auf das Gespräch!'),
         zu]);
     }

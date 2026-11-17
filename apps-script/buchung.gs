@@ -5,7 +5,8 @@
  * und trägt gebuchte Kennenlerngespräche ein (POST).
  *
  * Einrichten: script.google.com → Neues Projekt → diesen Code einfügen →
- * Bereitstellen → Neue Bereitstellung → Typ „Web-App“,
+ * links bei „Dienste“ auf + klicken und „Google Calendar API“ hinzufügen
+ * (nötig für den Google-Meet-Link) → Bereitstellen → Neue Bereitstellung → Typ „Web-App“,
  * Ausführen als „Ich“, Zugriff „Jeder“. Die Adresse der Web-App kommt in
  * index.html an den Knopf: data-buchen-api="…".
  */
@@ -31,7 +32,6 @@ function doPost(e) {
   const name = text(d.name, 80), email = text(d.email, 120), telefon = text(d.telefon, 40), nachricht = text(d.nachricht, 1000);
   const gueltig = name.length >= 2
     && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    && telefon.replace(/\D/g, '').length >= 6
     && /^\d{4}-\d{2}-\d{2}$/.test(d.datum) && /^\d{2}:00$/.test(d.zeit);
   if (!gueltig) return antwort({ ok: false, grund: 'eingabe' });
 
@@ -49,18 +49,29 @@ function doPost(e) {
 
     const start = zeitpunkt(d.datum, parseInt(d.zeit, 10));
     const ende = new Date(start.getTime() + DAUER_MIN * 60000);
-    const beschreibung = 'Kennenlerngespräch am Telefon. Till Börner ruft an.\n\n'
-      + 'Name: ' + name + '\nTelefon: ' + telefon + '\nE-Mail: ' + email
+    const beschreibung = 'Kennenlerngespräch per Google Meet. Der Link steht in diesem Termin.\n\n'
+      + 'Name: ' + name + (telefon ? '\nTelefon: ' + telefon : '') + '\nE-Mail: ' + email
       + (nachricht ? '\n\nWorum geht es?\n' + nachricht : '')
       + '\n\nGebucht über tillboerner.com';
-    CalendarApp.getDefaultCalendar().createEvent('Kennenlerngespräch mit Till Börner – ' + name, start, ende, {
-      description: beschreibung, guests: email, sendInvites: true
-    });
+    // Über die Calendar API (Dienst „Calendar“), weil nur sie ein Google Meet anlegen kann.
+    // Der Termin gilt als „Beschäftigt“ und sperrt die Zeit; der Gast bekommt die Einladung samt Meet-Link per E-Mail.
+    const termin = Calendar.Events.insert({
+      summary: 'Kennenlerngespräch mit Till Börner – ' + name,
+      description: beschreibung,
+      start: { dateTime: start.toISOString() },
+      end: { dateTime: ende.toISOString() },
+      attendees: [{ email: email, displayName: name }],
+      transparency: 'opaque',
+      conferenceData: { createRequest: { requestId: Utilities.getUuid(), conferenceSolutionKey: { type: 'hangoutsMeet' } } },
+      reminders: { useDefault: true }
+    }, 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
+    const meet = termin.hangoutLink || '';
     merker.setProperty(heute, String(anzahl + 1));
 
     const wann = Utilities.formatDate(start, ZONE, "dd.MM.yyyy 'um' HH:mm 'Uhr'");
-    MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Neues Kennenlerngespräch: ' + name + ', ' + wann, beschreibung);
-    return antwort({ ok: true });
+    MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Neues Kennenlerngespräch: ' + name + ', ' + wann,
+      beschreibung + (meet ? '\n\nGoogle Meet: ' + meet : ''));
+    return antwort({ ok: true, meet: meet });
   } finally {
     sperre.releaseLock();
   }
