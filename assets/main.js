@@ -283,6 +283,17 @@
     });
   }
 
+  /* ── Garantie-Stempel: wird aufgedrückt, sobald er beim ersten Herunterscrollen gut zu sehen ist ── */
+  const stempel = document.querySelector('.stempel');
+  if (stempel && !ruhig) {
+    stempel.classList.add('wartet');
+    new IntersectionObserver(([e], io) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      stempel.classList.replace('wartet', 'drauf');
+    }, { threshold: 0.7 }).observe(stempel);
+  }
+
   /* ── Navigation: aktiven Abschnitt markieren ── */
   const links = [...document.querySelectorAll('.nav a[href^="#"]')];
   const gehoertZu = { hochformat: 'filme' }; // Abschnitte ohne eigenen Menüpunkt

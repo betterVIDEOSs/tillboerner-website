@@ -320,11 +320,11 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .kunden__kopf h2 { font-family: var(--ui); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.02em; }
 .band { display: flex; width: max-content; gap: clamp(0.25rem, 1vw, 1rem); }
 .band ul { display: flex; gap: clamp(0.25rem, 1vw, 1rem); flex: none; }
-/* Die Logos sind vorab aufbereitet (_quellen/logos-aufbereiten.py): einfarbig, transparent,
-   alle auf derselben Fläche und optisch gleich schwer. Hier wird nur noch gesetzt. */
-.band img { width: clamp(8.5rem, 13vw, 12.5rem); aspect-ratio: 9 / 5; opacity: 0.84; transition: opacity 0.25s, scale 0.3s cubic-bezier(0.2, 0.8, 0.15, 1); }
+/* Die Logos sind vorab aufbereitet (_quellen/logos-aufbereiten.py): in ihren Originalfarben, freigestellt,
+   alle auf derselben Fläche und optisch etwa gleich groß. Hier wird nur noch gesetzt. */
+.band img { width: clamp(8.5rem, 13vw, 12.5rem); aspect-ratio: 9 / 5; transition: scale 0.3s cubic-bezier(0.2, 0.8, 0.15, 1); }
 /* Das Band läuft immer durch; wer über ein Logo fährt, sieht es etwas größer. */
-.band li:hover img { opacity: 1; scale: 1.14; }
+.band li:hover img { scale: 1.14; }
 .kunden__lauf { mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
 @media (prefers-reduced-motion: no-preference) {
   .band.laeuft { animation: lauf 70s linear infinite; }
@@ -336,9 +336,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 /* ───────── Manifest ─────────
    Links die Ansage: „packen“ in Pink, „einschläfern“ durchgestrichen, darunter die pinke Fläche.
    Rechts sieht man Till zum ersten Mal, seine Mission steht als Zitat unter dem Bild. */
-.manifest__raster { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto; gap: 1.5rem clamp(2rem, 5vw, 5rem); }
-.manifest__text, .manifest__weiter { grid-column: 1; }
-.manifest__till { grid-column: 2; grid-row: 1 / span 2; }
+.manifest__raster { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 1.5rem clamp(2rem, 5vw, 5rem); }
 /* Die linke Spalte gibt die Höhe vor; rechts füllt das Foto, was über dem Zitat frei bleibt.
    So schließen pinke Fläche und Zitat unten gemeinsam ab, ohne Leerraum dazwischen. */
 .manifest__text { display: grid; gap: clamp(1.75rem, 3vw, 2.75rem); align-content: start; }
@@ -361,13 +359,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .zitat p::after { content: "“"; }
 .zitat figcaption { margin-top: 0.9rem; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; letter-spacing: 0.01em; color: var(--leise); }
 .zitat figcaption::before { content: "– "; }
-.manifest__weiter { margin: 0; }
 .wort--pink { color: var(--akzent); }
 .wort--blau { color: var(--zweit); }
 .wort--orange { color: var(--orange); }
 @media (max-width: 52rem) {
   .manifest__raster { grid-template-columns: minmax(0, 1fr); }
-  .manifest__till { grid-column: 1; grid-row: auto; grid-template-rows: auto; }
+  .manifest__till { grid-template-rows: auto; }
   .manifest__foto { aspect-ratio: 1 / 1; min-height: 0; }
 }
 
@@ -565,6 +562,19 @@ html:has(dialog[open]) { overflow: hidden; }
 .stempel { grid-column: 9 / 13; justify-self: end; width: min(100%, 21rem); rotate: -11deg; color: var(--stempel); margin-top: 1rem; }
 .stempel text { font-family: var(--stempelschrift); font-weight: 800; fill: currentColor; }
 .stempel .stempel__wort { font-weight: 900; fill: var(--schrift); }
+/* Der Stempel wird aufgedrückt, wenn man beim Scrollen zum ersten Mal bei ihm ankommt:
+   Er kommt groß und schräg von oben, schlägt auf und federt kurz nach. main.js setzt die Klassen;
+   ohne JavaScript oder bei reduzierter Bewegung steht er einfach da. */
+@media (prefers-reduced-motion: no-preference) {
+  .stempel.wartet { opacity: 0; }
+  .stempel.drauf { animation: stempeln 0.62s both; }
+}
+@keyframes stempeln {
+  0% { opacity: 0; scale: 2.8; rotate: -30deg; filter: blur(5px); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.4); }
+  52% { opacity: 1; scale: 0.92; rotate: -9deg; filter: blur(0); animation-timing-function: ease-out; }
+  74% { scale: 1.05; rotate: -12deg; animation-timing-function: ease-in-out; }
+  100% { opacity: 1; scale: 1; rotate: -11deg; filter: blur(0); }
+}
 .garantie__text { grid-column: 1 / 13; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.5rem; border-top: 1.5px solid var(--grund); padding-top: 2rem; }
 .garantie__text > div:first-child { grid-column: 1 / 6; }
 .garantie__text > div:last-child { grid-column: 7 / 13; }
