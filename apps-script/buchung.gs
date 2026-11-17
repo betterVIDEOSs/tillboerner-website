@@ -6,7 +6,8 @@
  *
  * Einrichten: script.google.com → Neues Projekt → diesen Code einfügen →
  * links bei „Dienste“ auf + klicken und „Google Calendar API“ hinzufügen
- * (nötig für den Google-Meet-Link) → Bereitstellen → Neue Bereitstellung → Typ „Web-App“,
+ * (nötig für den Google-Meet-Link) → oben die Funktion „einrichten“ auswählen und
+ * einmal auf „Ausführen“ klicken (schaltet die Erinnerungs-Mails ein) → Bereitstellen → Neue Bereitstellung → Typ „Web-App“,
  * Ausführen als „Ich“, Zugriff „Jeder“. Die Adresse der Web-App kommt in
  * index.html an den Knopf: data-buchen-api="…".
  */
@@ -62,6 +63,8 @@ function doPost(e) {
       end: { dateTime: ende.toISOString() },
       attendees: [{ email: email, displayName: name }],
       transparency: 'opaque',
+      // Merker für die Erinnerungs-Mails. Liegt der Termin schon morgen, entfällt die Erinnerung am Vortag.
+      extendedProperties: { private: { buchung: '1', gast: email, name: name, vortag: start.getTime() - Date.now() < 26 * 3600000 ? 'entfaellt' : '', stunde: '' } },
       conferenceData: { createRequest: { requestId: Utilities.getUuid(), conferenceSolutionKey: { type: 'hangoutsMeet' } } },
       reminders: { useDefault: true }
     }, 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
@@ -75,6 +78,59 @@ function doPost(e) {
   } finally {
     sperre.releaseLock();
   }
+}
+
+/** Einmal von Hand ausführen: prüft alle 15 Minuten, ob Erinnerungen fällig sind. */
+function einrichten() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'erinnern') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('erinnern').timeBased().everyMinutes(15).create();
+}
+
+/** Schickt dem Gast je eine Erinnerung am Tag vorher (24 Stunden vor dem Termin) und eine Stunde vorher. */
+function erinnern() {
+  const jetzt = Date.now();
+  const liste = Calendar.Events.list('primary', {
+    timeMin: new Date(jetzt).toISOString(), timeMax: new Date(jetzt + 25 * 3600000).toISOString(),
+    singleEvents: true, privateExtendedProperty: 'buchung=1'
+  });
+  (liste.items || []).forEach(function (t) {
+    if (t.status === 'cancelled' || !t.start || !t.start.dateTime) return;
+    const merker = (t.extendedProperties && t.extendedProperties.private) || {};
+    const abgesagt = (t.attendees || []).some(function (g) { return g.email === merker.gast && g.responseStatus === 'declined'; });
+    if (!merker.gast || abgesagt) return;
+    const start = new Date(t.start.dateTime);
+    const bis = start.getTime() - jetzt;
+    let art = '';
+    if (bis > 0 && bis <= 3600000 && !merker.stunde) art = 'stunde';
+    else if (bis > 3600000 && bis <= 24 * 3600000 && !merker.vortag) art = 'vortag';
+    if (!art) return;
+
+    const tag = Utilities.formatDate(start, ZONE, 'dd.MM.yyyy');
+    const uhr = Utilities.formatDate(start, ZONE, 'HH:mm');
+    const betreff = art === 'stunde'
+      ? 'In einer Stunde: unser Gespräch um ' + uhr + ' Uhr'
+      : 'Morgen um ' + uhr + ' Uhr: unser Kennenlerngespräch';
+    const zeilen = [
+      'Guten Tag ' + (merker.name || '') + ',',
+      '',
+      art === 'stunde'
+        ? 'in einer Stunde, um ' + uhr + ' Uhr, sprechen wir miteinander.'
+        : 'eine kurze Erinnerung: Morgen, am ' + tag + ' um ' + uhr + ' Uhr, sprechen wir miteinander.',
+      '',
+      'Hier geht es zum Google Meet:',
+      t.hangoutLink || '(Der Link steht in Ihrer Kalendereinladung.)',
+      '',
+      'Falls Ihnen etwas dazwischenkommt, antworten Sie einfach auf diese E-Mail oder rufen Sie mich an: 0176 805 068 50.',
+      '',
+      'Ich freue mich auf das Gespräch!',
+      'Till Börner'
+    ];
+    MailApp.sendEmail(merker.gast, betreff, zeilen.join('\n'), { name: 'Till Börner' });
+    merker[art] = 'gesendet';
+    Calendar.Events.patch({ extendedProperties: { private: merker } }, 'primary', t.id);
+  });
 }
 
 /** Die Werktage der nächsten Woche mit ihren freien Startzeiten, z. B. { datum: '2026-11-19', zeiten: ['11:00', '14:00'] } */
