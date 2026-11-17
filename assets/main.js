@@ -387,9 +387,10 @@
     });
   }
 
-  // „Kennenlerngespräch buchen“: Die Buchungsseite von Google öffnet sich in einem Dialog, am Handy bildschirmfüllend.
-  // Der Rahmen wird erst beim ersten Klick geladen – vorher geht nichts an Google.
-  // Ohne <dialog> bleibt es beim Link in einem neuen Tab.
+  // „Kennenlerngespräch buchen“: Erst der Klick öffnet den Dialog – vorher geht nichts an Google.
+  // Mit data-buchen-api (Adresse des Apps-Script, siehe apps-script/buchung.gs) läuft die Buchung
+  // in drei Schritten im eigenen Design: Tag, Uhrzeit, Angaben. Ohne die Adresse zeigt der Dialog
+  // die Buchungsseite von Google im Rahmen. Ohne <dialog> bleibt es beim Link in einem neuen Tab.
   const buchen = document.querySelector('[data-buchen]');
   if (buchen && typeof HTMLDialogElement === 'function') {
     let buchung = null;
@@ -397,20 +398,198 @@
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
       e.preventDefault();
       if (!buchung) {
-        buchung = document.createElement('dialog');
-        buchung.className = 'raster buchung';
-        buchung.setAttribute('aria-label', 'Kennenlerngespräch buchen');
-        buchung.innerHTML = '<div class="raster__kopf"><h2>Kennenlerngespräch buchen</h2><form method="dialog"><button class="raster__zu">Schließen</button></form></div>';
-        const rahmen = document.createElement('iframe');
-        rahmen.className = 'buchung__rahmen';
-        rahmen.title = 'Terminbuchung über Google Kalender';
-        rahmen.src = buchen.href + '?gv=true';
-        buchung.append(rahmen);
+        const api = buchen.dataset.buchenApi;
+        buchung = api ? baueTermin(api) : baueRahmen(buchen.href);
         document.body.append(buchung);
         buchung.addEventListener('click', (ev) => { if (ev.target === buchung) buchung.close(); });
       }
       buchung.showModal();
+      if (buchung.los) buchung.los();
     });
+  }
+
+  function baueRahmen(adresse) {
+    const d = document.createElement('dialog');
+    d.className = 'raster buchung';
+    d.setAttribute('aria-label', 'Kennenlerngespräch buchen');
+    d.innerHTML = '<div class="raster__kopf"><h2>Kennenlerngespräch buchen</h2><form method="dialog"><button class="raster__zu">Schließen</button></form></div>';
+    const rahmen = document.createElement('iframe');
+    rahmen.className = 'buchung__rahmen';
+    rahmen.title = 'Terminbuchung über Google Kalender';
+    rahmen.src = adresse + '?gv=true';
+    d.append(rahmen);
+    return d;
+  }
+
+  function baueTermin(api) {
+    const d = document.createElement('dialog');
+    d.className = 'raster buchung termin';
+    d.setAttribute('aria-label', 'Kennenlerngespräch buchen');
+    d.innerHTML = '<div class="raster__kopf"><p class="termin__schritt" aria-live="polite"></p><form method="dialog"><button class="raster__zu">Schließen</button></form></div><div class="termin__inhalt"></div>';
+    const schritt = d.querySelector('.termin__schritt');
+    const inhalt = d.querySelector('.termin__inhalt');
+    const stand = { tage: null, tag: null, zeit: null, gebucht: false, angaben: {} };
+
+    const el = (art, klasse, text) => {
+      const e = document.createElement(art);
+      if (klasse) e.className = klasse;
+      if (text != null) e.textContent = text;
+      return e;
+    };
+    const datum = (iso) => { const [j, m, t] = iso.split('-').map(Number); return new Date(j, m - 1, t); };
+    const wochentag = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'long' });
+    const lang = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+    const kurz = (iso) => datum(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' }).replace(/\.$/, '');
+
+    function zeige(nr, titel, teile) {
+      schritt.innerHTML = '';
+      if (nr) {
+        for (let i = 1; i <= 3; i++) schritt.append(el('i', i <= nr ? 'an' : ''));
+        schritt.append(el('span', '', `Schritt ${nr} von 3`));
+      }
+      const h = el('h2', 'termin__titel', titel);
+      h.tabIndex = -1;
+      inhalt.replaceChildren(h, ...teile);
+      inhalt.scrollTop = 0;
+      h.focus({ preventScroll: true });
+    }
+
+    function wahl(text, zurueck) {
+      const p = el('p', 'termin__wahl');
+      p.append(el('span', '', text));
+      const b = el('button', '', 'ändern');
+      b.type = 'button';
+      b.addEventListener('click', zurueck);
+      p.append(b);
+      return p;
+    }
+
+    function hinweis(text) {
+      const p = el('p', 'termin__hinweis', text + ' Sie erreichen mich auch direkt: ');
+      const a = el('a', '', '0176 805 068 50');
+      a.href = 'tel:+4917680506850';
+      p.append(a, '.');
+      return p;
+    }
+
+    async function lade() {
+      zeige(0, 'Einen Moment …', [el('p', 'termin__text', 'Ich schaue in meinen Kalender.')]);
+      try {
+        const r = await fetch(api, { redirect: 'follow' });
+        const j = await r.json();
+        stand.tage = (j.tage || []).filter((t) => t.zeiten && t.zeiten.length).slice(0, 5);
+        tagWahl();
+      } catch (err) {
+        zeige(0, 'Das hat leider nicht geklappt.', [hinweis('Der Kalender ist gerade nicht erreichbar.')]);
+      }
+    }
+
+    function tagWahl(meldung) {
+      if (!stand.tage.length) {
+        zeige(0, 'In den nächsten Tagen ist alles belegt.', [hinweis('Rufen Sie mich einfach an, dann finden wir einen Termin.')]);
+        return;
+      }
+      const liste = el('div', 'termin__tage');
+      stand.tage.forEach((t) => {
+        const b = el('button', 'termin__tag');
+        b.type = 'button';
+        b.append(el('span', '', wochentag(t.datum)), el('b', '', kurz(t.datum)));
+        if (stand.tag === t) b.setAttribute('aria-pressed', 'true');
+        b.addEventListener('click', () => { stand.tag = t; stand.zeit = null; zeitWahl(); });
+        liste.append(b);
+      });
+      const teile = [el('p', 'termin__text', 'Ein erstes Gespräch am Telefon, unverbindlich, etwa 30 Minuten.'), liste];
+      if (meldung) teile.unshift(el('p', 'termin__meldung', meldung));
+      zeige(1, 'Welcher Tag passt Ihnen?', teile);
+    }
+
+    function zeitWahl() {
+      const gruppen = [['Mittags', 0, 15], ['Nachmittags', 15, 19], ['Abends', 19, 24]];
+      const raster = el('div', 'termin__zeiten');
+      gruppen.forEach(([name, von, bis]) => {
+        const zeiten = stand.tag.zeiten.filter((z) => { const h = parseInt(z, 10); return h >= von && h < bis; });
+        if (!zeiten.length) return;
+        raster.append(el('p', 'termin__gruppe', name));
+        const reihe = el('div', 'termin__reihe');
+        zeiten.forEach((z) => {
+          const b = el('button', 'termin__zeit', z);
+          b.type = 'button';
+          b.setAttribute('aria-label', z + ' Uhr');
+          if (stand.zeit === z) b.setAttribute('aria-pressed', 'true');
+          b.addEventListener('click', () => { stand.zeit = z; angaben(); });
+          reihe.append(b);
+        });
+        raster.append(reihe);
+      });
+      zeige(2, 'Um wie viel Uhr passt es Ihnen?', [wahl(lang(stand.tag.datum), () => tagWahl()), raster]);
+    }
+
+    function angaben(meldung) {
+      const f = el('form', 'termin__form');
+      f.noValidate = false;
+      const feld = (name, text, art, pflicht, auto) => {
+        const l = el('label', 'termin__feld');
+        l.append(el('span', '', text + (pflicht ? '' : ' (wenn Sie mögen)')));
+        const i = art === 'textarea' ? el('textarea') : el('input');
+        if (art !== 'textarea') i.type = art; else i.rows = 3;
+        i.name = name; i.required = pflicht; if (auto) i.autocomplete = auto;
+        i.value = stand.angaben[name] || '';
+        i.addEventListener('input', () => { stand.angaben[name] = i.value; });
+        l.append(i);
+        return l;
+      };
+      const falle = el('input', 'termin__falle'); falle.name = 'website'; falle.tabIndex = -1; falle.autocomplete = 'off'; falle.setAttribute('aria-hidden', 'true');
+      const recht = el('p', 'termin__recht', 'Ihre Angaben nutze ich nur für diesen Termin. Mehr dazu in der ');
+      const ds = el('a', '', 'Datenschutzerklärung'); ds.href = 'datenschutz.html'; ds.target = '_blank'; ds.rel = 'noopener';
+      recht.append(ds, '.');
+      const ab = el('button', 'btn', 'Termin buchen'); ab.type = 'submit';
+      f.append(
+        feld('name', 'Ihr Name', 'text', true, 'name'),
+        feld('telefon', 'Telefonnummer, unter der ich Sie anrufe', 'tel', true, 'tel'),
+        feld('email', 'E-Mail für die Terminbestätigung', 'email', true, 'email'),
+        feld('nachricht', 'Worum geht es?', 'textarea', false),
+        falle, recht, ab);
+      f.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        ab.disabled = true; ab.textContent = 'Wird gebucht …';
+        const daten = Object.fromEntries(new FormData(f));
+        daten.datum = stand.tag.datum; daten.zeit = stand.zeit;
+        try {
+          const r = await fetch(api, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(daten) });
+          const j = await r.json();
+          if (j.ok) { stand.gebucht = true; fertig(daten.email); return; }
+          if (j.grund === 'vergeben' && j.tage) {
+            stand.tage = j.tage.filter((t) => t.zeiten && t.zeiten.length).slice(0, 5);
+            stand.tag = null; stand.zeit = null;
+            tagWahl('Dieser Termin wurde gerade vergeben. Bitte wählen Sie einen anderen.');
+            return;
+          }
+          angaben(j.grund === 'eingabe' ? 'Bitte prüfen Sie Ihre Angaben.' : 'Das hat leider nicht geklappt. Bitte versuchen Sie es noch einmal oder rufen Sie mich an: 0176 805 068 50.');
+        } catch (err) {
+          angaben('Das hat leider nicht geklappt. Bitte versuchen Sie es noch einmal oder rufen Sie mich an: 0176 805 068 50.');
+        }
+      });
+      const teile = [wahl(`${lang(stand.tag.datum)}, ${stand.zeit} Uhr`, zeitWahl), f];
+      if (meldung) teile.unshift(el('p', 'termin__meldung', meldung));
+      zeige(3, 'Wie erreiche ich Sie?', teile);
+    }
+
+    function fertig(email) {
+      const zu = el('button', 'btn btn--linie', 'Schließen'); zu.type = 'button';
+      zu.addEventListener('click', () => d.close());
+      zeige(0, 'Der Termin steht.', [
+        el('p', 'termin__gross', `${lang(stand.tag.datum)}, ${stand.zeit} Uhr`),
+        el('p', 'termin__text', `Ich rufe Sie an. Die Bestätigung mit Kalendereintrag geht an ${email}.`),
+        el('p', 'termin__text termin__gruss', 'Ich freue mich auf das Gespräch!'),
+        zu]);
+    }
+
+    // Beim Öffnen: frisch laden, außer man steckt mitten in der Auswahl.
+    d.los = () => {
+      if (stand.gebucht) { stand.gebucht = false; stand.tag = null; stand.zeit = null; stand.tage = null; }
+      if (!stand.tage) lade();
+    };
+    return d;
   }
 
   const jahr = document.querySelector('[data-jahr]');

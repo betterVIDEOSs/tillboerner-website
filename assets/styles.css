@@ -421,6 +421,61 @@ html:has(dialog[open]) { overflow: hidden; }
   .buchung .raster__kopf h2 { font-size: 1.25rem; }
   .buchung .buchung__rahmen { flex: 1; height: auto; min-height: 0; border-radius: 0; }
 }
+/* Eigene Terminbuchung in drei Schritten (Tag, Uhrzeit, Angaben) */
+.termin { width: min(54rem, 100vw - 2rem); padding: clamp(1.5rem, 3.5vw, 3rem); }
+.termin .raster__kopf { align-items: center; min-height: 1.5rem; margin-bottom: clamp(1rem, 2.5vw, 1.75rem); }
+.termin__schritt { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--leise); }
+.termin__schritt i { width: 2.5rem; height: 4px; border-radius: 4px; background: var(--linie); }
+.termin__schritt i.an { background: var(--akzent); }
+.termin__schritt span { margin-left: 0.35rem; white-space: nowrap; }
+.termin__titel { font-family: var(--display); font-weight: 400; font-size: clamp(1.9rem, 4.2vw, 3.1rem); line-height: 1.08; max-width: 17ch; text-wrap: balance; outline: none; }
+.termin__text { margin: 0.9rem 0 0; max-width: 44ch; font-size: 1.125rem; line-height: 1.5; color: var(--leise); }
+.termin__gross { margin: 1.25rem 0 0; font-weight: 600; font-size: clamp(1.25rem, 2.2vw, 1.5rem); }
+.termin__gruss { color: var(--schrift); font-weight: 600; margin-bottom: 1.75rem; }
+.termin__meldung { margin: 0 0 1.25rem; padding: 0.8rem 1.1rem; border-radius: calc(var(--rund) * 0.6); background: var(--flaeche); border-left: 4px solid var(--akzent); font-weight: 600; }
+.termin__hinweis { margin: 1rem 0 0; max-width: 44ch; font-size: 1.125rem; line-height: 1.5; }
+.termin__hinweis a { white-space: nowrap; }
+.termin__tage { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.75rem; margin-top: clamp(1.5rem, 3vw, 2.25rem); }
+.termin__tag { text-align: left; padding: 1rem 1.15rem; border: 1px solid var(--linie); border-radius: calc(var(--rund) * 0.8); background: var(--flaeche); transition: background-color 0.15s, border-color 0.15s, color 0.15s; }
+.termin__tag span { display: block; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: var(--leise); }
+.termin__tag b { display: block; margin-top: 0.15rem; font-family: var(--display); font-weight: 400; font-size: 1.75rem; line-height: 1.1; white-space: nowrap; }
+.termin__tag[aria-pressed="true"] { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
+.termin__tag[aria-pressed="true"] span { color: var(--grund); }
+.termin__wahl { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; margin: 1.1rem 0 0; padding: 0.6rem 1.1rem; border-radius: 1.5rem; background: var(--flaeche); font-weight: 600; }
+.termin__wahl button { font: inherit; color: var(--zweit); text-decoration: underline; text-underline-offset: 3px; }
+.termin__wahl button:hover { color: var(--akzent); }
+.termin__zeiten { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 1rem 1.5rem; align-items: center; margin-top: clamp(1.5rem, 3vw, 2.25rem); }
+.termin__gruppe { margin: 0; font-family: var(--ui); font-weight: 600; }
+.termin__reihe { display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: 0.6rem; }
+.termin__zeit { height: 3.25rem; border: 1px solid var(--linie); border-radius: 999px; font-family: var(--ui); font-weight: 600; font-size: 1.0625rem; font-variant-numeric: tabular-nums; transition: background-color 0.15s, border-color 0.15s, color 0.15s; }
+.termin__zeit[aria-pressed="true"] { background: var(--akzent); border-color: var(--akzent); color: var(--auf-akzent); }
+@media (hover: hover) {
+  .termin__tag:hover { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
+  .termin__tag:hover span { color: var(--grund); }
+  .termin__zeit:hover { background: var(--akzent); border-color: var(--akzent); color: var(--auf-akzent); }
+}
+.termin__form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; margin-top: clamp(1.25rem, 2.5vw, 1.75rem); }
+.termin__feld { display: grid; gap: 0.4rem; }
+.termin__feld:nth-of-type(n+3), .termin__recht, .termin__form .btn { grid-column: 1 / -1; }
+.termin__feld span { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--leise); }
+.termin__feld input, .termin__feld textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--linie); border-radius: calc(var(--rund) * 0.6); background: var(--flaeche); color: var(--schrift); font: inherit; font-size: 1.0625rem; }
+.termin__feld textarea { resize: vertical; min-height: 5.5rem; }
+.termin__feld input:focus-visible, .termin__feld textarea:focus-visible { outline-offset: 0; border-color: var(--akzent); }
+.termin__falle { position: absolute; left: -200vw; width: 1px; height: 1px; opacity: 0; }
+.termin__recht { margin: 0; font-size: 0.9375rem; color: var(--leise); }
+.termin__form .btn { justify-self: start; }
+.termin__form .btn:disabled { opacity: 0.6; cursor: default; }
+@media (max-width: 48rem) {
+  .termin { width: auto; padding: 1rem 1.125rem 1.5rem; overflow-y: auto; }
+  .termin__schritt i { width: 1.75rem; }
+  .termin__inhalt { padding-top: 0.5rem; }
+  .termin__zeiten { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+  .termin__gruppe { margin-top: 0.75rem; }
+  .termin__form { grid-template-columns: minmax(0, 1fr); }
+  .termin__feld input, .termin__feld textarea { font-size: 1rem; }
+  .termin__form .btn { justify-self: stretch; justify-content: center; }
+}
+
 /* Der Inhalt kommt von Google und lässt sich nicht direkt gestalten. Deshalb wird der Rahmen als Ganzes umgefärbt:
    umkehren (Weiß wird Schwarz, Schrift hell), Farbton zurückdrehen (Blau bleibt Blau), dann aufhellend auf das Dunkelblau legen. */
 .buchung__rahmen { display: block; width: 100%; height: min(700px, 100svh - 9rem); border: 0; background: #fff; border-radius: calc(var(--rund) * 0.6); filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
@@ -660,7 +715,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .kontakt dt { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; letter-spacing: 0.01em; color: var(--leise); }
 .kontakt dd { margin: 0; font-size: 1.125rem; line-height: 1.45; }
 .kontakt address { font-style: normal; }
-.nummer { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1.1; white-space: nowrap; text-decoration: none; transition: color 0.2s; }
+.nummer { font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 7.6vw - 0.2rem, 2rem); line-height: 1.1; white-space: nowrap; text-decoration: none; transition: color 0.2s; }
+@media (min-width: 30rem) { .nummer { font-size: clamp(2rem, 3.4vw, 3rem); } }
 .kontakt__ruf { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem 1.25rem; }
 .kopiere { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--leise); text-decoration: underline; text-decoration-color: var(--linie); text-underline-offset: 0.25em; }
 .kopiere:hover { color: var(--akzent); }
