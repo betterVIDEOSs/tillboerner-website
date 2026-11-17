@@ -70,7 +70,6 @@
   --leise: #b1b4b8;       /* Nebentext */
   --akzent: #f95758;      /* Drachenfrucht Pink: Knöpfe und Hervorhebungen */
   --zweit: #90c4de;       /* Hellblau: leise Hervorhebungen im Text */
-  --orange: #fd8c04;      /* Orange: dritter Akzent, sparsam */
   --auf-akzent: #0c253d;  /* Text auf Akzentflächen */
   --auf-bild: #f0f1f1;    /* Text auf Fotos, Videos und Schwarz */
   --schwarz: #000;        /* Logo-Band, Fuß, Videoflächen */
@@ -361,7 +360,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .zitat figcaption::before { content: "– "; }
 .wort--pink { color: var(--akzent); }
 .wort--blau { color: var(--zweit); }
-.wort--orange { color: var(--orange); }
 @media (max-width: 52rem) {
   .manifest__raster { grid-template-columns: minmax(0, 1fr); }
   .manifest__till { grid-template-rows: auto; }
@@ -369,7 +367,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 
 /* ───────── Ablauf ─────────
-   Jeder Schritt hat seine Farbe aus dem Corporate Design: Pink, Hellblau, Orange. Das Bild steht fest daneben. */
+   Jeder Schritt hat seine Farbe aus dem Corporate Design: Pink und Hellblau im Wechsel. Das Bild steht fest daneben. */
 .ablauf { background: var(--flaeche); }
 .ablauf__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3rem 1.5rem; align-items: start; }
 .ablauf__bild { grid-column: 1 / 5; aspect-ratio: 3 / 4; overflow: hidden; }
@@ -384,7 +382,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .schritte li:nth-child(1) { --farbe: var(--akzent); }
 .schritte li:nth-child(2) { --farbe: var(--zweit); }
-.schritte li:nth-child(3) { --farbe: var(--orange); }
+.schritte li:nth-child(3) { --farbe: var(--akzent); }
 .schritte li::before {
   content: counter(schritt);
   font-family: var(--display); font-weight: 400; font-size: clamp(3.25rem, 6vw, 5.25rem); line-height: 0.85;
@@ -643,6 +641,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .titel.finale__titel { font-size: clamp(2rem, 3.4vw, 3.25rem); line-height: 1.1; max-width: 13ch; }
 .finale__text p { margin: 1.25rem 0 0; max-width: 34ch; font-size: 1.125rem; line-height: 1.55; color: var(--leise); }
 .finale__text .finale__gruss { color: var(--schrift); font-weight: 600; }
+.finale__text .finale__buchen { margin-top: 1.75rem; }
 .kontakt { margin: 0; border-top: 1px solid var(--linie); }
 .kontakt > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; padding-block: 1.1rem; border-bottom: 1px solid var(--linie); }
 .kontakt dt { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; letter-spacing: 0.01em; color: var(--leise); }
