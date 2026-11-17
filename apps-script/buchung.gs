@@ -16,7 +16,7 @@ const ZONE = 'Europe/Berlin';
 const DAUER_MIN = 30;        // Länge eines Gesprächs
 const VON_UHR = 11;          // erster Termin beginnt um 11:00
 const BIS_UHR = 23;          // letzter Termin beginnt um 22:00
-const TAGE_VORAUS = 7;       // buchbar ist die kommende Woche
+const TAGE_VORAUS = 14;      // buchbar sind die nächsten zwei Wochen
 const VORLAUF_STD = 12;      // frühestens in 12 Stunden
 const PUFFER_MIN = 15;       // Abstand zu anderen Terminen
 const MAX_PRO_TAG = 8;       // Schutz vor Missbrauch: höchstens so viele Buchungen pro Kalendertag
@@ -133,7 +133,7 @@ function erinnern() {
   });
 }
 
-/** Die Werktage der nächsten Woche mit ihren freien Startzeiten, z. B. { datum: '2026-11-19', zeiten: ['11:00', '14:00'] } */
+/** Die Werktage der nächsten zwei Wochen mit ihren freien Startzeiten, z. B. { datum: '2026-11-19', zeiten: ['11:00', '14:00'] } */
 function freieTage() {
   const kalender = CalendarApp.getDefaultCalendar();
   const jetzt = new Date();

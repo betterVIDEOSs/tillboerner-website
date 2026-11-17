@@ -477,7 +477,7 @@
       try {
         const r = await fetch(api, { redirect: 'follow' });
         const j = await r.json();
-        stand.tage = (j.tage || []).filter((t) => t.zeiten && t.zeiten.length).slice(0, 5);
+        stand.tage = (j.tage || []).filter((t) => t.zeiten && t.zeiten.length).slice(0, 10);
         tagWahl();
       } catch (err) {
         zeige(0, 'Das hat leider nicht geklappt.', [hinweis('Der Kalender ist gerade nicht erreichbar.')]);
@@ -559,7 +559,7 @@
           const j = await r.json();
           if (j.ok) { stand.gebucht = true; fertig(daten.email, j.meet); return; }
           if (j.grund === 'vergeben' && j.tage) {
-            stand.tage = j.tage.filter((t) => t.zeiten && t.zeiten.length).slice(0, 5);
+            stand.tage = j.tage.filter((t) => t.zeiten && t.zeiten.length).slice(0, 10);
             stand.tag = null; stand.zeit = null;
             tagWahl('Dieser Termin wurde gerade vergeben. Bitte wählen Sie einen anderen.');
             return;
