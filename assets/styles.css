@@ -413,7 +413,9 @@ html:has(dialog[open]) { overflow: hidden; }
 .raster__zu:hover { color: var(--akzent); }
 /* Terminbuchung: gleicher Dialog, darin die Buchungsseite von Google (hell, deshalb weißer Grund) */
 .buchung { width: min(64rem, 100vw - 2rem); max-height: calc(100svh - 2rem); }
-.buchung__rahmen { display: block; width: 100%; height: min(700px, 100svh - 9rem); border: 0; background: #fff; border-radius: calc(var(--rund) * 0.6); }
+/* Der Inhalt kommt von Google und lässt sich nicht direkt gestalten. Deshalb wird der Rahmen als Ganzes umgefärbt:
+   umkehren (Weiß wird Schwarz, Schrift hell), Farbton zurückdrehen (Blau bleibt Blau), dann aufhellend auf das Dunkelblau legen. */
+.buchung__rahmen { display: block; width: 100%; height: min(700px, 100svh - 9rem); border: 0; background: #fff; border-radius: calc(var(--rund) * 0.6); filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
 .raster__liste { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem 0.75rem; }
 .raster__film { display: block; width: 100%; text-align: left; }
 .raster__film span { display: block; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--schwarz); }
