@@ -411,16 +411,6 @@ html:has(dialog[open]) { overflow: hidden; }
 .raster__kopf h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.75rem, 3vw, 2.5rem); line-height: 1.1; }
 .raster__zu { font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; padding: 0.3rem 0; }
 .raster__zu:hover { color: var(--akzent); }
-/* Terminbuchung: gleicher Dialog, darin die Buchungsseite von Google (hell, deshalb weißer Grund) */
-.buchung { width: min(64rem, 100vw - 2rem); max-height: calc(100svh - 2rem); }
-@media (max-width: 48rem) {
-  /* Handy: Der Dialog füllt den Bildschirm, der Kalender bekommt die ganze Höhe unter dem Kopf. */
-  .buchung { position: fixed; inset: 0; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 1rem 0.75rem 0; border-radius: 0; box-shadow: none; display: none; flex-direction: column; }
-  .buchung[open] { display: flex; }
-  .buchung .raster__kopf { align-items: center; margin-bottom: 0.75rem; padding-inline: 0.25rem; }
-  .buchung .raster__kopf h2 { font-size: 1.25rem; }
-  .buchung .buchung__rahmen { flex: 1; height: auto; min-height: 0; border-radius: 0; }
-}
 /* Eigene Terminbuchung: links Tills Foto mit einem Satz von ihm, rechts eine helle Fläche mit Tag, Uhrzeit, Angaben */
 .termin { --hell: #f0f1f1; --tinte: var(--grund); --tinte-leise: #4a5d70; --strich: #d3d9de;
   border: 0; padding: 0; overflow: hidden; width: min(70rem, 100vw - 2rem); max-width: none; height: min(43rem, 100svh - 2rem); max-height: none;
@@ -497,9 +487,11 @@ html:has(dialog[open]) { overflow: hidden; }
   .termin__fuss .btn, .termin__form .btn { flex: 1; justify-content: center; justify-self: stretch; align-self: stretch; }
 }
 
-/* Der Inhalt kommt von Google und lässt sich nicht direkt gestalten. Deshalb wird der Rahmen als Ganzes umgefärbt:
-   umkehren (Weiß wird Schwarz, Schrift hell), Farbton zurückdrehen (Blau bleibt Blau), dann aufhellend auf das Dunkelblau legen. */
-.buchung__rahmen { display: block; width: 100%; height: min(700px, 100svh - 9rem); border: 0; background: #fff; border-radius: calc(var(--rund) * 0.6); filter: invert(1) hue-rotate(180deg); mix-blend-mode: screen; }
+/* Übergang ohne Apps-Script: rechts die Buchungsseite von Google. Sie ist von Haus aus weiß, deshalb weißer Grund. */
+.termin--rahmen { --hell: #fff; }
+.termin--rahmen .termin__seite { padding: 0.75rem 0 0; overflow: hidden; }
+.termin--rahmen .termin__zu { padding: 0 1.25rem 0.5rem; }
+.termin__rahmen { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
 .raster__liste { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem 0.75rem; }
 .raster__film { display: block; width: 100%; text-align: left; }
 .raster__film span { display: block; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--schwarz); }
@@ -707,7 +699,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .fragen__kopf { grid-column: 1 / 6; position: sticky; top: calc(var(--kopf) + 2rem); }
 .fragen__kopf .gross { margin-top: 1rem; }
 .portraet { display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; }
-.portraet img { width: 5.5rem; height: 5.5rem; border-radius: 50%; object-fit: cover; }
+.portraet img { width: 6.5rem; height: 6.5rem; border-radius: 50%; object-fit: cover; }
 .portraet p { font-size: 1rem; line-height: 1.4; }
 .fragen__liste { grid-column: 6 / 13; }
 .frage { border-top: 1px solid var(--linie); }

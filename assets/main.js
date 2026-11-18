@@ -419,16 +419,25 @@
     });
   }
 
+  // Linke Seite des Buchungsdialogs: Tills Foto mit einem Satz von ihm (am Handy ein Querformat-Ausschnitt).
+  const terminBild = '<figure class="termin__bild"><picture>'
+    + '<source media="(max-width: 52rem)" type="image/avif" srcset="assets/img/till-boerner-gespraech-quer.avif">'
+    + '<source media="(max-width: 52rem)" srcset="assets/img/till-boerner-gespraech-quer.jpg">'
+    + '<source type="image/avif" srcset="assets/img/till-boerner-gespraech.avif">'
+    + '<img src="assets/img/till-boerner-gespraech.jpg" alt="Till Börner sitzt lächelnd am Schreibtisch und erzählt" width="780" height="1333"></picture>'
+    + '<figcaption><q>Erzählen Sie mir, was Sie vorhaben. Den Rest finden wir gemeinsam heraus.</q><span>Till Börner</span></figcaption></figure>';
+
+  // Übergang, solange das Apps-Script nicht eingerichtet ist: derselbe Dialog, rechts die Buchungsseite von Google.
   function baueRahmen(adresse) {
     const d = document.createElement('dialog');
-    d.className = 'raster buchung';
+    d.className = 'termin termin--rahmen';
     d.setAttribute('aria-label', 'Kennenlerngespräch buchen');
-    d.innerHTML = '<div class="raster__kopf"><h2>Kennenlerngespräch buchen</h2><form method="dialog"><button class="raster__zu">Schließen</button></form></div>';
+    d.innerHTML = terminBild + '<div class="termin__seite"><form method="dialog" class="termin__zu"><button class="raster__zu">Schließen</button></form></div>';
     const rahmen = document.createElement('iframe');
-    rahmen.className = 'buchung__rahmen';
+    rahmen.className = 'termin__rahmen';
     rahmen.title = 'Terminbuchung über Google Kalender';
     rahmen.src = adresse + '?gv=true';
-    d.append(rahmen);
+    d.querySelector('.termin__seite').append(rahmen);
     return d;
   }
 
@@ -436,13 +445,7 @@
     const d = document.createElement('dialog');
     d.className = 'termin';
     d.setAttribute('aria-label', 'Kennenlerngespräch buchen');
-    d.innerHTML = '<figure class="termin__bild"><picture>'
-      + '<source media="(max-width: 52rem)" type="image/avif" srcset="assets/img/till-boerner-gespraech-quer.avif">'
-      + '<source media="(max-width: 52rem)" srcset="assets/img/till-boerner-gespraech-quer.jpg">'
-      + '<source type="image/avif" srcset="assets/img/till-boerner-gespraech.avif">'
-      + '<img src="assets/img/till-boerner-gespraech.jpg" alt="Till Börner sitzt lächelnd am Schreibtisch und erzählt" width="780" height="1333"></picture>'
-      + '<figcaption><q>Erzählen Sie mir, was Sie vorhaben. Den Rest finden wir gemeinsam heraus.</q><span>Till Börner</span></figcaption></figure>'
-      + '<div class="termin__seite"><form method="dialog" class="termin__zu"><button class="raster__zu">Schließen</button></form><div class="termin__inhalt"></div></div>';
+    d.innerHTML = terminBild + '<div class="termin__seite"><form method="dialog" class="termin__zu"><button class="raster__zu">Schließen</button></form><div class="termin__inhalt"></div></div>';
     const inhalt = d.querySelector('.termin__inhalt');
     const stand = { tage: null, tag: null, zeit: null, gebucht: false, angaben: {} };
 
