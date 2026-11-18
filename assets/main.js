@@ -408,6 +408,17 @@
     });
   }
 
+  // Weitere Knöpfe (z. B. „Anfrage senden“ im Hero) öffnen denselben Dialog; ohne Skript springen sie zum Kontakt.
+  if (buchen && typeof HTMLDialogElement === 'function') {
+    document.querySelectorAll('[data-buchen-auf]').forEach((k) => {
+      k.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        buchen.click();
+      });
+    });
+  }
+
   function baueRahmen(adresse) {
     const d = document.createElement('dialog');
     d.className = 'raster buchung';
