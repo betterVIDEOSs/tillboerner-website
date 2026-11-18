@@ -404,7 +404,7 @@
       <div class="schritt__text">
         <p>Lassen Sie uns ein Brainstorming machen. Wir sprechen über Ihr Unternehmen, Ihre Ziele und die zugehörige Zielgruppe.</p>
         <p>Dann schauen wir, ob Ihnen mein Mediamarketing weiterhelfen kann.</p>
-        <p class="mit-abstand"><a class="btn" href="#kontakt">Termin sichern</a></p>
+        <p class="mit-abstand"><a class="btn" href="#kontakt" data-buchen-auf>Termin sichern</a></p>
       </div>
       <div class="faelle">
         <div>
@@ -416,19 +416,44 @@
           <p>verduften Sie mit einem Bündel neuer Ideen und einem frischen Blickwinkel auf Ihr Business.</p>
         </div>
       </div>
-      <div class="einblicke">
-        <picture>
-          <source type="image/avif" srcset="assets/img/till-boerner-veranstaltung.avif">
-          <img src="assets/img/till-boerner-veranstaltung.jpg" alt="Till Börner fotografiert bei einer Veranstaltung" width="1024" height="682" loading="lazy" decoding="async">
-        </picture>
-        <picture>
-          <source type="image/avif" srcset="assets/img/till-boerner-set.avif">
-          <img src="assets/img/till-boerner-set.jpg" alt="Till Börner mit Kamera am Set neben einem Kollegen" width="618" height="510" loading="lazy" decoding="async">
-        </picture>
-        <picture>
-          <source type="image/avif" srcset="assets/img/till-boerner-abenddreh.avif">
-          <img src="assets/img/till-boerner-abenddreh.jpg" alt="Till Börner filmt am Abend mit Kamera-Rig im Freien" width="680" height="481" loading="lazy" decoding="async">
-        </picture>
+      <div class="einblicke" data-einblicke>
+        <ul class="einblicke__band" tabindex="0" aria-label="Einblicke in die Arbeit von Till Börner">
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/einblick-kamera.avif">
+            <img src="assets/img/einblick-kamera.jpg" alt="Till Börner prüft lachend das Bild auf seiner Kamera" width="1000" height="1138" loading="lazy" decoding="async" style="object-position: 42% 50%">
+          </picture></li>
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/einblick-segelschiff.avif">
+            <img src="assets/img/einblick-segelschiff.jpg" alt="Till Börner mit Kamera an Deck eines Segelschiffs" width="1000" height="1500" loading="lazy" decoding="async" style="object-position: 50% 45%">
+          </picture></li>
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/einblick-veranstaltung.avif">
+            <img src="assets/img/einblick-veranstaltung.jpg" alt="Till Börner fotografiert über ein Geländer hinweg" width="1000" height="1250" loading="lazy" decoding="async">
+          </picture></li>
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/einblick-drohne.avif">
+            <img src="assets/img/einblick-drohne.jpg" alt="Till Börner baut eine Drohne zusammen" width="1000" height="1500" loading="lazy" decoding="async" style="object-position: 50% 25%">
+          </picture></li>
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/till-boerner-veranstaltung.avif">
+            <img src="assets/img/till-boerner-veranstaltung.jpg" alt="Till Börner fotografiert bei einer Veranstaltung" width="1024" height="682" loading="lazy" decoding="async" style="object-position: 62% 50%">
+          </picture></li>
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/till-boerner-set.avif">
+            <img src="assets/img/till-boerner-set.jpg" alt="Till Börner mit Kamera am Set neben einem Kollegen" width="618" height="510" loading="lazy" decoding="async" style="object-position: 40% 50%">
+          </picture></li>
+          <li><picture>
+            <source type="image/avif" srcset="assets/img/till-boerner-abenddreh.avif">
+            <img src="assets/img/till-boerner-abenddreh.jpg" alt="Till Börner filmt am Abend mit Kamera-Rig im Freien" width="680" height="481" loading="lazy" decoding="async" style="object-position: 68% 50%">
+          </picture></li>
+        </ul>
+        <div class="einblicke__leiste" hidden>
+          <span class="einblicke__zahl" aria-live="polite"></span>
+          <span class="einblicke__knoepfe">
+            <button class="einblicke__knopf" type="button" data-zurueck aria-label="Vorheriges Bild"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button>
+            <button class="einblicke__knopf" type="button" data-weiter aria-label="Nächstes Bild"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></button>
+          </span>
+        </div>
       </div>
     </div>
   </section>

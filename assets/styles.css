@@ -421,60 +421,80 @@ html:has(dialog[open]) { overflow: hidden; }
   .buchung .raster__kopf h2 { font-size: 1.25rem; }
   .buchung .buchung__rahmen { flex: 1; height: auto; min-height: 0; border-radius: 0; }
 }
-/* Eigene Terminbuchung in drei Schritten (Tag, Uhrzeit, Angaben) */
-.termin { width: min(54rem, 100vw - 2rem); padding: clamp(1.5rem, 3.5vw, 3rem); }
-.termin .raster__kopf { align-items: center; min-height: 1.5rem; margin-bottom: clamp(1rem, 2.5vw, 1.75rem); }
-.termin__schritt { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--leise); }
-.termin__schritt i { width: 2.5rem; height: 4px; border-radius: 4px; background: var(--linie); }
-.termin__schritt i.an { background: var(--akzent); }
-.termin__schritt span { margin-left: 0.35rem; white-space: nowrap; }
-.termin__titel { font-family: var(--display); font-weight: 400; font-size: clamp(1.9rem, 4.2vw, 3.1rem); line-height: 1.08; max-width: 17ch; text-wrap: balance; outline: none; }
-.termin__text { margin: 0.9rem 0 0; max-width: 44ch; font-size: 1.125rem; line-height: 1.5; color: var(--leise); }
-.termin__gross { margin: 1.25rem 0 0; font-weight: 600; font-size: clamp(1.25rem, 2.2vw, 1.5rem); }
+/* Eigene Terminbuchung: links Tills Foto mit einem Satz von ihm, rechts eine helle Fläche mit Tag, Uhrzeit, Angaben */
+.termin { --hell: #f0f1f1; --tinte: var(--grund); --tinte-leise: #4a5d70; --strich: #d3d9de;
+  border: 0; padding: 0; overflow: hidden; width: min(70rem, 100vw - 2rem); max-width: none; height: min(43rem, 100svh - 2rem); max-height: none;
+  border-radius: var(--rund); background: var(--hell); color: var(--tinte); box-shadow: 0 2rem 5rem rgb(var(--schatten) / 0.6); }
+.termin[open] { display: grid; grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr); }
+.termin::backdrop { background: rgb(var(--schatten) / 0.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.termin :focus-visible { outline-color: var(--tinte); }
+.termin__bild { position: relative; margin: 0; background: var(--schwarz); min-height: 0; }
+.termin__bild picture, .termin__bild img { display: block; width: 100%; height: 100%; }
+.termin__bild img { object-fit: cover; object-position: 30% 30%; }
+.termin__bild figcaption { position: absolute; inset: auto 0 0 0; padding: 7rem clamp(1.5rem, 2.6vw, 2.5rem) clamp(1.5rem, 2.4vw, 2.25rem); background: linear-gradient(transparent, rgb(var(--schatten) / 0.9) 60%); color: var(--auf-bild); }
+.termin__bild q { quotes: none; display: block; font-family: var(--display); font-size: clamp(1.4rem, 2.2vw, 2.05rem); line-height: 1.14; text-wrap: balance; }
+.termin__bild figcaption span { display: block; margin-top: 0.8rem; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: #c6ddf5; }
+.termin__seite { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: clamp(1.25rem, 2.2vw, 2.25rem) clamp(1.25rem, 3.2vw, 3.25rem) clamp(1.5rem, 2.6vw, 2.5rem); }
+.termin__zu { display: flex; justify-content: flex-end; }
+.termin__zu .raster__zu:hover { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.termin__inhalt { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.termin__titel { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.05; text-wrap: balance; outline: none; }
+.termin__text { margin: 0.6rem 0 0; max-width: 44ch; font-size: 1.0625rem; line-height: 1.5; color: var(--tinte-leise); }
 .termin__text:empty { display: none; }
-.termin__gruss { color: var(--schrift); font-weight: 600; margin-bottom: 1.75rem; }
-.termin__meldung { margin: 0 0 1.25rem; padding: 0.8rem 1.1rem; border-radius: calc(var(--rund) * 0.6); background: var(--flaeche); border-left: 4px solid var(--akzent); font-weight: 600; }
-.termin__hinweis { margin: 1rem 0 0; max-width: 44ch; font-size: 1.125rem; line-height: 1.5; }
-.termin__hinweis a { white-space: nowrap; }
-.termin__tage { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.75rem; margin-top: clamp(1.5rem, 3vw, 2.25rem); }
-.termin__tag { text-align: left; padding: 1rem 1.15rem; border: 1px solid var(--linie); border-radius: calc(var(--rund) * 0.8); background: var(--flaeche); transition: background-color 0.15s, border-color 0.15s, color 0.15s; }
-.termin__tag span { display: block; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: var(--leise); }
-.termin__tag b { display: block; margin-top: 0.15rem; font-family: var(--display); font-weight: 400; font-size: 1.75rem; line-height: 1.1; white-space: nowrap; }
-.termin__tag[aria-pressed="true"] { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
-.termin__tag[aria-pressed="true"] span { color: var(--grund); }
-.termin__wahl { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; margin: 1.1rem 0 0; padding: 0.6rem 1.1rem; border-radius: 1.5rem; background: var(--flaeche); font-weight: 600; }
-.termin__wahl button { font: inherit; color: var(--zweit); text-decoration: underline; text-underline-offset: 3px; }
-.termin__wahl button:hover { color: var(--akzent); }
-.termin__zeiten { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 1rem 1.5rem; align-items: center; margin-top: clamp(1.5rem, 3vw, 2.25rem); }
-.termin__gruppe { margin: 0; font-family: var(--ui); font-weight: 600; }
-.termin__reihe { display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: 0.6rem; }
-.termin__zeit { height: 3.25rem; border: 1px solid var(--linie); border-radius: 999px; font-family: var(--ui); font-weight: 600; font-size: 1.0625rem; font-variant-numeric: tabular-nums; transition: background-color 0.15s, border-color 0.15s, color 0.15s; }
-.termin__zeit[aria-pressed="true"] { background: var(--akzent); border-color: var(--akzent); color: var(--auf-akzent); }
+.termin__text a, .termin__recht a { color: var(--tinte); }
+.termin__gross { margin: 1.25rem 0 0; font-weight: 600; font-size: clamp(1.25rem, 2.2vw, 1.5rem); }
+.termin__gruss { color: var(--tinte); font-weight: 600; margin-bottom: 1.75rem; }
+.termin__meldung { order: -1; margin: 0 0 1.25rem; padding: 0.8rem 1.1rem; border-radius: calc(var(--rund) * 0.6); background: #fff; border-left: 4px solid var(--akzent); font-weight: 600; }
+/* Tage als Kapseln zum Durchwischen; rechts läuft das Band weich aus */
+.termin__band { display: flex; gap: 0.6rem; margin: 1.5rem calc(-1 * clamp(1.25rem, 3.2vw, 3.25rem)) 0 0; padding: 4px clamp(1.25rem, 3.2vw, 3.25rem) 4px 4px; margin-left: -4px;
+  overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-mask: linear-gradient(90deg, #000 calc(100% - 4rem), transparent); mask: linear-gradient(90deg, #000 calc(100% - 4rem), transparent); }
+.termin__band::-webkit-scrollbar { display: none; }
+.termin__kap { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem; width: 4.5rem; height: 6.25rem; border-radius: 2.25rem; background: #fff; scroll-snap-align: start; transition: background-color 0.15s, color 0.15s; }
+.termin__kap span { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--tinte-leise); }
+.termin__kap b { font-family: var(--display); font-weight: 400; font-size: 2.1rem; line-height: 1; }
+.termin__kap[aria-pressed="true"] { background: var(--tinte); color: var(--hell); }
+.termin__kap[aria-pressed="true"] span { color: #c6ddf5; }
+/* Uhrzeiten als Liste in drei Spalten */
+.termin__spalten { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(1.25rem, 2.6vw, 2.25rem); margin-top: 1.5rem; }
+.termin__spalte p { margin: 0 0 0.2rem; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: var(--tinte-leise); }
+.termin__zeit, .termin__leer { display: block; width: calc(100% + 1.6rem); margin-inline: -0.8rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--strich); text-align: left; font-family: var(--ui); font-weight: 600; font-size: 1.125rem; font-variant-numeric: tabular-nums; transition: background-color 0.15s; }
+.termin__leer { border-bottom: 0; font-weight: 400; font-size: 1rem; color: var(--tinte-leise); }
+.termin__zeit[aria-pressed="true"] { background: var(--akzent); border-color: transparent; border-radius: 999px; }
 @media (hover: hover) {
-  .termin__tag:hover { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
-  .termin__tag:hover span { color: var(--grund); }
-  .termin__zeit:hover { background: var(--akzent); border-color: var(--akzent); color: var(--auf-akzent); }
+  .termin__kap:hover:not([aria-pressed="true"]) { background: #c6ddf5; }
+  .termin__zeit:hover:not([aria-pressed="true"]) { background: #fff; border-color: transparent; border-radius: 999px; }
 }
-.termin__form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; margin-top: clamp(1.25rem, 2.5vw, 1.75rem); }
-.termin__feld { display: grid; gap: 0.4rem; }
+.termin__fuss { margin-top: auto; padding-top: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; }
+.termin__wahl { margin: 0; font-weight: 600; font-size: 1.0625rem; }
+.termin .btn { background: var(--tinte); border-color: var(--tinte); color: var(--hell); }
+.termin .btn:hover { background: var(--akzent); border-color: var(--akzent); color: var(--tinte); }
+.termin .btn:disabled { opacity: 0.35; cursor: default; background: var(--tinte); border-color: var(--tinte); color: var(--hell); }
+.termin__gewaehlt { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; align-self: flex-start; margin: 1rem 0 0; padding: 0.55rem 1.1rem; border-radius: 1.5rem; background: #fff; font-weight: 600; }
+.termin__gewaehlt button { font: inherit; text-decoration: underline; text-underline-offset: 3px; color: var(--tinte-leise); }
+.termin__gewaehlt button:hover { color: var(--tinte); }
+.termin__form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem 1.25rem; margin-top: 1.25rem; }
+.termin__feld { display: grid; gap: 0.35rem; }
 .termin__feld:nth-of-type(n+3), .termin__recht, .termin__form .btn { grid-column: 1 / -1; }
-.termin__feld span { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--leise); }
-.termin__feld input, .termin__feld textarea { width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--linie); border-radius: calc(var(--rund) * 0.6); background: var(--flaeche); color: var(--schrift); font: inherit; font-size: 1.0625rem; }
-.termin__feld textarea { resize: vertical; min-height: 5.5rem; }
-.termin__feld input:focus-visible, .termin__feld textarea:focus-visible { outline-offset: 0; border-color: var(--akzent); }
+.termin__feld span { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--tinte-leise); }
+.termin__feld input, .termin__feld textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--strich); border-radius: calc(var(--rund) * 0.6); background: #fff; color: var(--tinte); font: inherit; font-size: 1.0625rem; }
+.termin__feld textarea { resize: vertical; min-height: 5rem; }
+.termin__feld input:focus-visible, .termin__feld textarea:focus-visible { outline-offset: 0; border-color: var(--tinte); }
 .termin__falle { position: absolute; left: -200vw; width: 1px; height: 1px; opacity: 0; }
-.termin__recht { margin: 0; font-size: 0.9375rem; color: var(--leise); }
-.termin__form .btn { justify-self: start; }
-.termin__form .btn:disabled { opacity: 0.6; cursor: default; }
-@media (max-width: 48rem) {
-  .termin { width: auto; padding: 1rem 1.125rem 1.5rem; overflow-y: auto; }
-  .termin__schritt i { width: 1.75rem; }
-  .termin__inhalt { padding-top: 0.5rem; }
-  .termin__zeiten { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
-  .termin__gruppe { margin-top: 0.75rem; }
+.termin__recht { margin: 0; font-size: 0.9375rem; color: var(--tinte-leise); }
+.termin__form .btn, .termin__inhalt > .btn { justify-self: start; align-self: flex-start; }
+@media (max-width: 52rem) {
+  /* Handy und kleines Tablet: bildschirmfüllend, das Foto wird zum Kopfstreifen */
+  .termin { position: fixed; inset: 0; width: auto; height: auto; margin: 0; border-radius: 0; }
+  .termin[open] { grid-template-columns: minmax(0, 1fr); grid-template-rows: 8.5rem minmax(0, 1fr); }
+  .termin__bild img { object-position: 30% 22%; }
+  .termin__bild figcaption { display: none; }
+  .termin__zu { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 1; }
+  .termin__zu .raster__zu { padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--hell); }
+  .termin__spalten { gap: 0 1.25rem; }
+  .termin__zeit { font-size: 1rem; }
   .termin__form { grid-template-columns: minmax(0, 1fr); }
   .termin__feld input, .termin__feld textarea { font-size: 1rem; }
-  .termin__form .btn { justify-self: stretch; justify-content: center; }
+  .termin__fuss .btn, .termin__form .btn { flex: 1; justify-content: center; justify-self: stretch; align-self: stretch; }
 }
 
 /* Der Inhalt kommt von Google und lässt sich nicht direkt gestalten. Deshalb wird der Rahmen als Ganzes umgefärbt:
@@ -654,20 +674,32 @@ html:has(dialog[open]) { overflow: hidden; }
 }
 
 /* ───────── Nächster Schritt ───────── */
-.schritt__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; }
-.schritt__kopf { grid-column: 1 / 10; }
+.schritt__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; align-items: start; }
+.schritt__kopf { grid-column: 1 / 8; grid-row: 1; }
 .schritt__frage { margin-bottom: 1rem; }
 .schritt__zusatz { margin-top: 1.5rem; color: var(--zweit); }
-.schritt__text { grid-column: 1 / 6; }
-.faelle { grid-column: 7 / 13; display: grid; gap: 0; align-content: start; }
+.schritt__text { grid-column: 1 / 7; grid-row: 2; }
+.faelle { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; align-content: start; }
 .faelle div { border-top: 1px solid var(--linie); padding-block: 1.25rem 1.5rem; }
 .faelle h3 { font-family: var(--ui); font-weight: 800; font-size: 1.625rem; letter-spacing: 0.01em; line-height: 1.1; margin-bottom: 0.4rem; }
-.einblicke { grid-column: 1 / -1; display: grid; grid-template-columns: 1.5fr 1.2fr 1.4fr; gap: 0.75rem; margin-top: 1rem; }
-.einblicke img { width: 100%; height: clamp(11rem, 26vw, 24rem); object-fit: cover; }
-@media (max-width: 52rem) {
-  .schritt__kopf, .schritt__text, .faelle { grid-column: 1 / -1; }
-  .einblicke { grid-template-columns: 1fr 1fr; }
-  .einblicke picture:first-child img { grid-column: 1 / -1; }
+/* Einblicke: Fotos zum Durchblättern, füllen die rechte Seite neben Titel und Text */
+.einblicke { grid-column: 9 / -1; grid-row: 1 / span 2; position: relative; }
+.einblicke__band { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; aspect-ratio: 4 / 5; border-radius: var(--rund); background: var(--flaeche); }
+.einblicke__band::-webkit-scrollbar { display: none; }
+.einblicke__band li { flex: 0 0 100%; scroll-snap-align: start; }
+.einblicke__band picture, .einblicke__band img { display: block; width: 100%; height: 100%; }
+.einblicke__band img { object-fit: cover; }
+.einblicke__leiste { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.9rem; }
+.einblicke__zahl { font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: var(--leise); font-variant-numeric: tabular-nums; }
+.einblicke__knoepfe { display: flex; gap: 0.5rem; }
+.einblicke__knopf { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid rgb(var(--schrift-rgb) / 0.45); transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+.einblicke__knopf:hover { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
+.einblicke__knopf svg { width: 1.1rem; height: 1.1rem; }
+@media (max-width: 62rem) {
+  .schritt__kopf, .schritt__text, .faelle { grid-column: 1 / -1; grid-row: auto; }
+  .einblicke { grid-column: 1 / -1; grid-row: auto; max-width: 30rem; }
+}
+@media (max-width: 40rem) { .faelle { grid-template-columns: minmax(0, 1fr); } }
 }
 
 /* ───────── Fragen ───────── */

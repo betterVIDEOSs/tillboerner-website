@@ -434,10 +434,12 @@
 
   function baueTermin(api) {
     const d = document.createElement('dialog');
-    d.className = 'raster buchung termin';
+    d.className = 'termin';
     d.setAttribute('aria-label', 'Kennenlerngespräch buchen');
-    d.innerHTML = '<div class="raster__kopf"><p class="termin__schritt" aria-live="polite"></p><form method="dialog"><button class="raster__zu">Schließen</button></form></div><div class="termin__inhalt"></div>';
-    const schritt = d.querySelector('.termin__schritt');
+    d.innerHTML = '<figure class="termin__bild"><picture><source type="image/avif" srcset="assets/img/till-boerner-gespraech.avif">'
+      + '<img src="assets/img/till-boerner-gespraech.jpg" alt="Till Börner sitzt lächelnd am Schreibtisch und erzählt" width="843" height="1333"></picture>'
+      + '<figcaption><q>Erzählen Sie mir, was Sie vorhaben. Den Rest finden wir gemeinsam heraus.</q><span>Till Börner</span></figcaption></figure>'
+      + '<div class="termin__seite"><form method="dialog" class="termin__zu"><button class="raster__zu">Schließen</button></form><div class="termin__inhalt"></div></div>';
     const inhalt = d.querySelector('.termin__inhalt');
     const stand = { tage: null, tag: null, zeit: null, gebucht: false, angaben: {} };
 
@@ -448,35 +450,19 @@
       return e;
     };
     const datum = (iso) => { const [j, m, t] = iso.split('-').map(Number); return new Date(j, m - 1, t); };
-    const wochentag = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'long' });
     const lang = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-    const kurz = (iso) => datum(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' }).replace(/\.$/, '');
+    const kurzTag = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'short' }).replace(/\.$/, '');
+    const mitZeiten = (tage) => (tage || []).filter((t) => t.zeiten && t.zeiten.length).slice(0, 10);
 
-    function zeige(nr, titel, teile) {
-      schritt.innerHTML = '';
-      if (nr) {
-        for (let i = 1; i <= 3; i++) schritt.append(el('i', i <= nr ? 'an' : ''));
-        schritt.append(el('span', '', `Schritt ${nr} von 3`));
-      }
+    function zeige(titel, teile, fokus) {
       const h = el('h2', 'termin__titel', titel);
       h.tabIndex = -1;
       inhalt.replaceChildren(h, ...teile);
-      inhalt.scrollTop = 0;
-      h.focus({ preventScroll: true });
-    }
-
-    function wahl(text, zurueck) {
-      const p = el('p', 'termin__wahl');
-      p.append(el('span', '', text));
-      const b = el('button', '', 'ändern');
-      b.type = 'button';
-      b.addEventListener('click', zurueck);
-      p.append(b);
-      return p;
+      if (fokus !== false) { d.querySelector('.termin__seite').scrollTop = 0; h.focus({ preventScroll: true }); }
     }
 
     function hinweis(text) {
-      const p = el('p', 'termin__hinweis', text + ' Sie erreichen mich auch direkt: ');
+      const p = el('p', 'termin__text', text + ' Sie erreichen mich auch direkt: ');
       const a = el('a', '', '0176 805 068 50');
       a.href = 'tel:+4917680506850';
       p.append(a, '.');
@@ -484,60 +470,85 @@
     }
 
     async function lade() {
-      zeige(0, 'Einen Moment …', [el('p', 'termin__text', 'Ich schaue in meinen Kalender.')]);
+      zeige('Einen Moment …', [el('p', 'termin__text', 'Ich schaue in meinen Kalender.')]);
       try {
         const r = await fetch(api, { redirect: 'follow' });
         const j = await r.json();
-        stand.tage = (j.tage || []).filter((t) => t.zeiten && t.zeiten.length).slice(0, 10);
-        tagWahl();
+        stand.tage = mitZeiten(j.tage);
+        terminWahl();
       } catch (err) {
-        zeige(0, 'Das hat leider nicht geklappt.', [hinweis('Der Kalender ist gerade nicht erreichbar.')]);
+        zeige('Das hat leider nicht geklappt.', [hinweis('Der Kalender ist gerade nicht erreichbar.')]);
       }
     }
 
-    function tagWahl(meldung) {
+    // Tag und Uhrzeit in einer Ansicht: oben das Band mit den Tagen, darunter die freien Zeiten des gewählten Tages.
+    function terminWahl(meldung, fokusTag) {
       if (!stand.tage.length) {
-        zeige(0, 'In den nächsten Tagen ist alles belegt.', [hinweis('Rufen Sie mich einfach an, dann finden wir einen Termin.')]);
+        zeige('In den nächsten zwei Wochen ist alles belegt.', [hinweis('Rufen Sie mich einfach an, dann finden wir einen Termin.')]);
         return;
       }
-      const liste = el('div', 'termin__tage');
-      stand.tage.forEach((t) => {
-        const b = el('button', 'termin__tag');
-        b.type = 'button';
-        b.append(el('span', '', wochentag(t.datum)), el('b', '', kurz(t.datum)));
-        if (stand.tag === t) b.setAttribute('aria-pressed', 'true');
-        b.addEventListener('click', () => { stand.tag = t; stand.zeit = null; zeitWahl(); });
-        liste.append(b);
-      });
-      const teile = [el('p', 'termin__text', 'Ein erstes Gespräch per Video über Google Meet, unverbindlich, etwa 30 Minuten.'), liste];
-      if (meldung) teile.unshift(el('p', 'termin__meldung', meldung));
-      zeige(1, 'Welcher Tag passt Ihnen?', teile);
-    }
+      if (!stand.tag) stand.tag = stand.tage[0];
+      const alt = inhalt.querySelector('.termin__band');
+      const rollen = alt ? alt.scrollLeft : 0;
 
-    function zeitWahl() {
-      const gruppen = [['Mittags', 0, 15], ['Nachmittags', 15, 19], ['Abends', 19, 24]];
-      const raster = el('div', 'termin__zeiten');
-      gruppen.forEach(([name, von, bis]) => {
-        const zeiten = stand.tag.zeiten.filter((z) => { const h = parseInt(z, 10); return h >= von && h < bis; });
-        if (!zeiten.length) return;
-        raster.append(el('p', 'termin__gruppe', name));
-        const reihe = el('div', 'termin__reihe');
-        zeiten.forEach((z) => {
-          const b = el('button', 'termin__zeit', z);
-          b.type = 'button';
-          b.setAttribute('aria-label', z + ' Uhr');
-          if (stand.zeit === z) b.setAttribute('aria-pressed', 'true');
-          b.addEventListener('click', () => { stand.zeit = z; angaben(); });
-          reihe.append(b);
-        });
-        raster.append(reihe);
+      const band = el('div', 'termin__band');
+      band.setAttribute('role', 'group');
+      band.setAttribute('aria-label', 'Tag wählen');
+      stand.tage.forEach((t) => {
+        const b = el('button', 'termin__kap');
+        b.type = 'button';
+        b.setAttribute('aria-label', lang(t.datum));
+        b.setAttribute('aria-pressed', String(stand.tag === t));
+        b.append(el('span', '', kurzTag(t.datum)), el('b', '', String(datum(t.datum).getDate())));
+        b.addEventListener('click', () => { if (stand.tag !== t) { stand.tag = t; stand.zeit = null; } terminWahl(null, true); });
+        band.append(b);
       });
-      zeige(2, 'Um wie viel Uhr passt es Ihnen?', [wahl(lang(stand.tag.datum), () => tagWahl()), raster]);
+
+      const spalten = el('div', 'termin__spalten');
+      const zeitKnoepfe = [];
+      [['Mittags', 0, 15], ['Nachmittags', 15, 19], ['Abends', 19, 24]].forEach(([name, von, bis]) => {
+        const sp = el('div', 'termin__spalte');
+        sp.append(el('p', '', name));
+        const zeiten = stand.tag.zeiten.filter((z) => { const h = parseInt(z, 10); return h >= von && h < bis; });
+        if (!zeiten.length) sp.append(el('span', 'termin__leer', 'nichts frei'));
+        zeiten.forEach((z) => {
+          const b = el('button', 'termin__zeit', z + ' Uhr');
+          b.type = 'button';
+          b.setAttribute('aria-pressed', String(stand.zeit === z));
+          b.addEventListener('click', () => { stand.zeit = z; frisch(); });
+          zeitKnoepfe.push([z, b]);
+          sp.append(b);
+        });
+        spalten.append(sp);
+      });
+
+      const fuss = el('div', 'termin__fuss');
+      const wahl = el('p', 'termin__wahl');
+      wahl.setAttribute('aria-live', 'polite');
+      const weiter = el('button', 'btn', 'Weiter');
+      weiter.type = 'button';
+      weiter.addEventListener('click', () => { if (stand.zeit) angaben(); });
+      fuss.append(wahl, weiter);
+      const frisch = () => {
+        zeitKnoepfe.forEach(([z, b]) => b.setAttribute('aria-pressed', String(stand.zeit === z)));
+        wahl.textContent = lang(stand.tag.datum) + (stand.zeit ? `, ${stand.zeit} Uhr` : '');
+        weiter.disabled = !stand.zeit;
+      };
+      frisch();
+
+      const teile = [el('p', 'termin__text', '30 Minuten per Google Meet, unverbindlich.'), band, spalten, fuss];
+      if (meldung) teile.unshift(el('p', 'termin__meldung', meldung));
+      zeige('Wann passt es Ihnen?', teile, !fokusTag);
+      band.scrollLeft = rollen;
+      const an = band.querySelector('[aria-pressed="true"]');
+      if (an) {
+        if (!alt) band.scrollLeft = Math.max(0, an.offsetLeft - band.offsetLeft - 8);
+        if (fokusTag) an.focus({ preventScroll: true });
+      }
     }
 
     function angaben(meldung) {
       const f = el('form', 'termin__form');
-      f.noValidate = false;
       const feld = (name, text, art, pflicht, auto) => {
         const l = el('label', 'termin__feld');
         l.append(el('span', '', text + (pflicht ? '' : ' (wenn Sie mögen)')));
@@ -560,6 +571,7 @@
         feld('telefon', 'Telefonnummer', 'tel', false, 'tel'),
         feld('nachricht', 'Worum geht es?', 'textarea', false),
         falle, recht, ab);
+      const fehler = 'Das hat leider nicht geklappt. Bitte versuchen Sie es noch einmal oder rufen Sie mich an: 0176 805 068 50.';
       f.addEventListener('submit', async (e) => {
         e.preventDefault();
         ab.disabled = true; ab.textContent = 'Wird gebucht …';
@@ -570,19 +582,24 @@
           const j = await r.json();
           if (j.ok) { stand.gebucht = true; fertig(daten.email, j.meet); return; }
           if (j.grund === 'vergeben' && j.tage) {
-            stand.tage = j.tage.filter((t) => t.zeiten && t.zeiten.length).slice(0, 10);
+            stand.tage = mitZeiten(j.tage);
             stand.tag = null; stand.zeit = null;
-            tagWahl('Dieser Termin wurde gerade vergeben. Bitte wählen Sie einen anderen.');
+            terminWahl('Dieser Termin wurde gerade vergeben. Bitte wählen Sie einen anderen.');
             return;
           }
-          angaben(j.grund === 'eingabe' ? 'Bitte prüfen Sie Ihre Angaben.' : 'Das hat leider nicht geklappt. Bitte versuchen Sie es noch einmal oder rufen Sie mich an: 0176 805 068 50.');
+          angaben(j.grund === 'eingabe' ? 'Bitte prüfen Sie Ihre Angaben.' : fehler);
         } catch (err) {
-          angaben('Das hat leider nicht geklappt. Bitte versuchen Sie es noch einmal oder rufen Sie mich an: 0176 805 068 50.');
+          angaben(fehler);
         }
       });
-      const teile = [wahl(`${lang(stand.tag.datum)}, ${stand.zeit} Uhr`, zeitWahl), f];
+      const zurueck = el('p', 'termin__gewaehlt');
+      zurueck.append(el('span', '', `${lang(stand.tag.datum)}, ${stand.zeit} Uhr`));
+      const b = el('button', '', 'ändern'); b.type = 'button';
+      b.addEventListener('click', () => terminWahl());
+      zurueck.append(b);
+      const teile = [zurueck, f];
       if (meldung) teile.unshift(el('p', 'termin__meldung', meldung));
-      zeige(3, 'Wie erreiche ich Sie?', teile);
+      zeige('Wie erreiche ich Sie?', teile);
     }
 
     function fertig(email, meet) {
@@ -591,9 +608,9 @@
         const a = el('a', '', meet.replace('https://', '')); a.href = meet; a.target = '_blank'; a.rel = 'noopener';
         link.append('Ihr Link zum Gespräch: ', a);
       }
-      const zu = el('button', 'btn btn--linie', 'Schließen'); zu.type = 'button';
+      const zu = el('button', 'btn', 'Schließen'); zu.type = 'button';
       zu.addEventListener('click', () => d.close());
-      zeige(0, 'Der Termin steht.', [
+      zeige('Der Termin steht.', [
         el('p', 'termin__gross', `${lang(stand.tag.datum)}, ${stand.zeit} Uhr`),
         el('p', 'termin__text', `Wir sprechen per Google Meet. Die Einladung mit dem Link ist unterwegs an ${email}.`),
         link,
@@ -608,6 +625,23 @@
     };
     return d;
   }
+
+  // Einblicke: Fotos zum Durchblättern. Ohne Skript lässt sich das Band wischen und rollen.
+  document.querySelectorAll('[data-einblicke]').forEach((box) => {
+    const band = box.querySelector('.einblicke__band');
+    const leiste = box.querySelector('.einblicke__leiste');
+    const zahl = box.querySelector('.einblicke__zahl');
+    const n = band.children.length;
+    if (n < 2) return;
+    const wo = () => Math.round(band.scrollLeft / band.clientWidth);
+    const zeigeZahl = () => { zahl.textContent = `${wo() + 1} von ${n}`; };
+    const gehe = (i) => band.scrollTo({ left: ((i + n) % n) * band.clientWidth, behavior: ruhig ? 'auto' : 'smooth' });
+    box.querySelector('[data-zurueck]').addEventListener('click', () => gehe(wo() - 1));
+    box.querySelector('[data-weiter]').addEventListener('click', () => gehe(wo() + 1));
+    band.addEventListener('scroll', zeigeZahl, { passive: true });
+    zeigeZahl();
+    leiste.hidden = false;
+  });
 
   const jahr = document.querySelector('[data-jahr]');
   if (jahr) jahr.textContent = new Date().getFullYear();
