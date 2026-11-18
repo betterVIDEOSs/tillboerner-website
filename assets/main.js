@@ -436,8 +436,11 @@
     const d = document.createElement('dialog');
     d.className = 'termin';
     d.setAttribute('aria-label', 'Kennenlerngespräch buchen');
-    d.innerHTML = '<figure class="termin__bild"><picture><source type="image/avif" srcset="assets/img/till-boerner-gespraech.avif">'
-      + '<img src="assets/img/till-boerner-gespraech.jpg" alt="Till Börner sitzt lächelnd am Schreibtisch und erzählt" width="843" height="1333"></picture>'
+    d.innerHTML = '<figure class="termin__bild"><picture>'
+      + '<source media="(max-width: 52rem)" type="image/avif" srcset="assets/img/till-boerner-gespraech-quer.avif">'
+      + '<source media="(max-width: 52rem)" srcset="assets/img/till-boerner-gespraech-quer.jpg">'
+      + '<source type="image/avif" srcset="assets/img/till-boerner-gespraech.avif">'
+      + '<img src="assets/img/till-boerner-gespraech.jpg" alt="Till Börner sitzt lächelnd am Schreibtisch und erzählt" width="780" height="1333"></picture>'
       + '<figcaption><q>Erzählen Sie mir, was Sie vorhaben. Den Rest finden wir gemeinsam heraus.</q><span>Till Börner</span></figcaption></figure>'
       + '<div class="termin__seite"><form method="dialog" class="termin__zu"><button class="raster__zu">Schließen</button></form><div class="termin__inhalt"></div></div>';
     const inhalt = d.querySelector('.termin__inhalt');
@@ -626,20 +629,16 @@
     return d;
   }
 
-  // Einblicke: Fotos zum Durchblättern. Ohne Skript lässt sich das Band wischen und rollen.
+  // Einblicke: drei Fotos nebeneinander, die Pfeile blättern bildweise. Ohne Skript lässt sich das Band wischen und rollen.
   document.querySelectorAll('[data-einblicke]').forEach((box) => {
     const band = box.querySelector('.einblicke__band');
     const leiste = box.querySelector('.einblicke__leiste');
-    const zahl = box.querySelector('.einblicke__zahl');
-    const n = band.children.length;
-    if (n < 2) return;
-    const wo = () => Math.round(band.scrollLeft / band.clientWidth);
-    const zeigeZahl = () => { zahl.textContent = `${wo() + 1} von ${n}`; };
-    const gehe = (i) => band.scrollTo({ left: ((i + n) % n) * band.clientWidth, behavior: ruhig ? 'auto' : 'smooth' });
-    box.querySelector('[data-zurueck]').addEventListener('click', () => gehe(wo() - 1));
-    box.querySelector('[data-weiter]').addEventListener('click', () => gehe(wo() + 1));
-    band.addEventListener('scroll', zeigeZahl, { passive: true });
-    zeigeZahl();
+    if (band.children.length < 2) return;
+    const schritt = () => band.children[1].offsetLeft - band.children[0].offsetLeft;
+    const ende = () => band.scrollWidth - band.clientWidth - 4;
+    const gehe = (links) => band.scrollTo({ left: links, behavior: ruhig ? 'auto' : 'smooth' });
+    box.querySelector('[data-zurueck]').addEventListener('click', () => gehe(band.scrollLeft <= 4 ? ende() + 4 : band.scrollLeft - schritt()));
+    box.querySelector('[data-weiter]').addEventListener('click', () => gehe(band.scrollLeft >= ende() ? 0 : band.scrollLeft + schritt()));
     leiste.hidden = false;
   });
 

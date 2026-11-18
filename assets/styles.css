@@ -430,7 +430,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .termin :focus-visible { outline-color: var(--tinte); }
 .termin__bild { position: relative; margin: 0; background: var(--schwarz); min-height: 0; }
 .termin__bild picture, .termin__bild img { display: block; width: 100%; height: 100%; }
-.termin__bild img { object-fit: cover; object-position: 30% 30%; }
+.termin__bild img { object-fit: cover; object-position: 50% 30%; }
 .termin__bild figcaption { position: absolute; inset: auto 0 0 0; padding: 7rem clamp(1.5rem, 2.6vw, 2.5rem) clamp(1.5rem, 2.4vw, 2.25rem); background: linear-gradient(transparent, rgb(var(--schatten) / 0.9) 60%); color: var(--auf-bild); }
 .termin__bild q { quotes: none; display: block; font-family: var(--display); font-size: clamp(1.4rem, 2.2vw, 2.05rem); line-height: 1.14; text-wrap: balance; }
 .termin__bild figcaption span { display: block; margin-top: 0.8rem; font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: #c6ddf5; }
@@ -485,8 +485,8 @@ html:has(dialog[open]) { overflow: hidden; }
 @media (max-width: 52rem) {
   /* Handy und kleines Tablet: bildschirmfüllend, das Foto wird zum Kopfstreifen */
   .termin { position: fixed; inset: 0; width: auto; height: auto; margin: 0; border-radius: 0; }
-  .termin[open] { grid-template-columns: minmax(0, 1fr); grid-template-rows: 8.5rem minmax(0, 1fr); }
-  .termin__bild img { object-position: 30% 22%; }
+  .termin[open] { grid-template-columns: minmax(0, 1fr); grid-template-rows: min(14.5rem, 30svh) minmax(0, 1fr); }
+  .termin__bild img { object-position: 50% 30%; }
   .termin__bild figcaption { display: none; }
   .termin__zu { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 1; }
   .termin__zu .raster__zu { padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--hell); }
@@ -679,27 +679,26 @@ html:has(dialog[open]) { overflow: hidden; }
 .schritt__frage { margin-bottom: 1rem; }
 .schritt__zusatz { margin-top: 1.5rem; color: var(--zweit); }
 .schritt__text { grid-column: 1 / 7; grid-row: 2; }
-.faelle { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; align-content: start; }
+/* Die beiden Fälle füllen die rechte Seite neben Titel und Text */
+.faelle { grid-column: 9 / -1; grid-row: 1 / span 2; align-self: end; display: grid; gap: 0; align-content: start; }
 .faelle div { border-top: 1px solid var(--linie); padding-block: 1.25rem 1.5rem; }
 .faelle h3 { font-family: var(--ui); font-weight: 800; font-size: 1.625rem; letter-spacing: 0.01em; line-height: 1.1; margin-bottom: 0.4rem; }
-/* Einblicke: Fotos zum Durchblättern, füllen die rechte Seite neben Titel und Text */
-.einblicke { grid-column: 9 / -1; grid-row: 1 / span 2; position: relative; }
-.einblicke__band { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; aspect-ratio: 4 / 5; border-radius: var(--rund); background: var(--flaeche); }
+/* Einblicke: drei Fotos nebeneinander zum Durchblättern */
+.einblicke { grid-column: 1 / -1; margin-top: 1rem; }
+.einblicke__band { --luecke: 0.75rem; display: flex; gap: var(--luecke); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--rund); }
 .einblicke__band::-webkit-scrollbar { display: none; }
-.einblicke__band li { flex: 0 0 100%; scroll-snap-align: start; }
+.einblicke__band li { flex: 0 0 calc((100% - 2 * var(--luecke)) / 3); aspect-ratio: 4 / 5; scroll-snap-align: start; border-radius: var(--rund); overflow: hidden; background: var(--flaeche); }
 .einblicke__band picture, .einblicke__band img { display: block; width: 100%; height: 100%; }
 .einblicke__band img { object-fit: cover; }
-.einblicke__leiste { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.9rem; }
-.einblicke__zahl { font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; color: var(--leise); font-variant-numeric: tabular-nums; }
-.einblicke__knoepfe { display: flex; gap: 0.5rem; }
+.einblicke__leiste { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.9rem; }
 .einblicke__knopf { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid rgb(var(--schrift-rgb) / 0.45); transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
 .einblicke__knopf:hover { background: var(--schrift); border-color: var(--schrift); color: var(--grund); }
 .einblicke__knopf svg { width: 1.1rem; height: 1.1rem; }
 @media (max-width: 62rem) {
   .schritt__kopf, .schritt__text, .faelle { grid-column: 1 / -1; grid-row: auto; }
-  .einblicke { grid-column: 1 / -1; grid-row: auto; max-width: 30rem; }
+  .einblicke__band li { flex-basis: calc((100% - var(--luecke)) / 2); }
 }
-@media (max-width: 40rem) { .faelle { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 36rem) { .einblicke__band li { flex-basis: 78%; } }
 }
 
 /* ───────── Fragen ───────── */
