@@ -480,6 +480,8 @@ html:has(dialog[open]) { overflow: hidden; }
   .termin__bild figcaption { display: none; }
   .termin__zu { position: absolute; top: 0.75rem; right: 0.75rem; z-index: 1; }
   .termin__zu .raster__zu { padding: 0.45rem 0.9rem; border-radius: 999px; background: var(--hell); }
+  .termin--rahmen .termin__zu { position: static; }
+  .termin--rahmen .termin__zu .raster__zu { padding: 0.3rem 0; background: none; }
   .termin__spalten { gap: 0 1.25rem; }
   .termin__zeit { font-size: 1rem; }
   .termin__form { grid-template-columns: minmax(0, 1fr); }
@@ -491,7 +493,10 @@ html:has(dialog[open]) { overflow: hidden; }
 .termin--rahmen { --hell: #fff; }
 .termin--rahmen .termin__seite { padding: 0.75rem 0 0; overflow: hidden; }
 .termin--rahmen .termin__zu { padding: 0 1.25rem 0.5rem; }
-.termin__rahmen { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
+.termin__rahmen { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; filter: grayscale(1) contrast(1.12); }
+/* Googles Blau wird zu Grau, die dunkelblaue Schicht darüber hellt nur auf: Schwarz wird Dunkelblau, Weiß bleibt Weiß. */
+.termin--rahmen .termin__seite { position: relative; }
+.termin--rahmen .termin__seite::after { content: ""; position: absolute; inset: 0; background: var(--grund); mix-blend-mode: screen; pointer-events: none; }
 .raster__liste { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem 0.75rem; }
 .raster__film { display: block; width: 100%; text-align: left; }
 .raster__film span { display: block; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--schwarz); }
@@ -698,9 +703,12 @@ html:has(dialog[open]) { overflow: hidden; }
 .fragen__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; align-items: start; }
 .fragen__kopf { grid-column: 1 / 6; position: sticky; top: calc(var(--kopf) + 2rem); }
 .fragen__kopf .gross { margin-top: 1rem; }
-.portraet { display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; }
-.portraet img { width: 6.5rem; height: 6.5rem; border-radius: 50%; object-fit: cover; }
+/* Till freigestellt vor einem hellblauen Bogen: Kopf und Kamera ragen oben heraus, unten schließt der Bogen ab */
+.portraet { display: grid; gap: 1.75rem; margin-top: 2rem; }
 .portraet p { font-size: 1rem; line-height: 1.4; }
+.portraet__figur { position: relative; width: min(19rem, 100%); height: min(23rem, 46svh); clip-path: inset(-50% -20% 0 -20% round 0 0 var(--rund) var(--rund)); }
+.portraet__figur::before { content: ""; position: absolute; inset: 30% 0 0 0; background: var(--zweit); border-radius: 10rem 10rem var(--rund) var(--rund); }
+.portraet__figur img { position: absolute; bottom: 0; left: 46%; translate: -50% 0; height: 100%; width: auto; max-width: none; }
 .fragen__liste { grid-column: 6 / 13; }
 .frage { border-top: 1px solid var(--linie); }
 .frage:last-child { border-bottom: 1px solid var(--linie); }
