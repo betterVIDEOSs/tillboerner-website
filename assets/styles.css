@@ -717,9 +717,12 @@ html:has(dialog[open]) { overflow: hidden; }
 .fragen__kopf { grid-column: 1 / 6; grid-row: 1; }
 .fragen__kopf .gross { margin-top: 1rem; }
 .fragen__hinweis { margin-top: 2rem; font-size: 1rem; line-height: 1.4; }
-/* Till freigestellt, ohne Form dahinter. Er steht fest am unteren Rand des Abschnitts und wandert beim Scrollen nicht mit. */
-.fragen__figur { grid-column: 1 / 6; grid-row: 2; align-self: end; margin-bottom: calc(-1 * var(--abstand)); }
-.fragen__figur img { display: block; width: auto; height: min(30rem, 34vw); max-width: 100%; object-fit: contain; object-position: left bottom; }
+/* Till freigestellt, ohne Form dahinter. Er steht fest unter dem Hinweis, wandert beim Scrollen nicht mit
+   und läuft nach unten weich aus, statt hart abgeschnitten zu enden. Die Breite ist so gewählt, dass er
+   bei geschlossenen Fragen etwa auf Höhe der letzten Frage endet. */
+.fragen__figur { grid-column: 1 / 6; grid-row: 2; align-self: start; }
+.fragen__figur img { display: block; width: min(100%, 27.5rem); height: auto;
+  -webkit-mask-image: linear-gradient(#000 68%, transparent 98%); mask-image: linear-gradient(#000 68%, transparent 98%); }
 .fragen__liste { grid-column: 6 / 13; grid-row: 1 / span 2; }
 .frage { border-top: 1px solid var(--linie); }
 .frage:last-child { border-bottom: 1px solid var(--linie); }
@@ -742,8 +745,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .frage__antwort li::before { content: "–"; position: absolute; left: 0; color: var(--akzent); }
 @media (max-width: 62rem) {
   .fragen__kopf, .fragen__liste, .fragen__figur { grid-column: 1 / -1; grid-row: auto; }
-  .fragen__figur { order: 3; margin-top: 1rem; }
-  .fragen__figur img { height: min(24rem, 90vw); margin-inline: auto; }
+  .fragen__figur { order: 3; }
+  .fragen__figur img { width: min(16rem, 70vw); margin-inline: auto; }
 }
 
 /* ───────── Finale / Kontakt ─────────
