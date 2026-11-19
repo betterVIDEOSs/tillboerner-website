@@ -686,10 +686,11 @@ html:has(dialog[open]) { overflow: hidden; }
 .schritt__frage { margin-bottom: 1rem; }
 .schritt__zusatz { margin-top: 1.5rem; color: var(--zweit); }
 .schritt__text { grid-column: 1 / 7; grid-row: 2; }
-/* Die beiden Fälle füllen die rechte Seite neben Titel und Text */
-.faelle { grid-column: 9 / -1; grid-row: 1 / span 2; align-self: end; display: grid; gap: 0; align-content: start; }
-.faelle div { border-top: 1px solid var(--linie); padding-block: 1.25rem 1.5rem; }
-.faelle h3 { font-family: var(--ui); font-weight: 800; font-size: 1.625rem; letter-spacing: 0.01em; line-height: 1.1; margin-bottom: 0.4rem; }
+/* Die beiden Fälle stehen als zwei Flächen rechts neben Titel und Text und füllen die Spalte von oben bis unten. */
+.faelle { grid-column: 8 / -1; grid-row: 1 / span 2; align-self: stretch; display: grid; grid-template-rows: 1fr 1fr; gap: 0.75rem; }
+.faelle div { display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(1.5rem, 2.6vw, 2.5rem); border-radius: var(--rund); background: var(--flaeche); }
+.faelle h3 { font-family: var(--display); font-weight: 400; font-size: clamp(1.75rem, 2.8vw, 2.75rem); line-height: 1.05; margin-bottom: 0.6rem; }
+.faelle p { max-width: 34ch; font-size: clamp(1.0625rem, 1.25vw, 1.25rem); line-height: 1.45; }
 /* Einblicke: drei Fotos nebeneinander zum Durchblättern */
 .einblicke { grid-column: 1 / -1; margin-top: 1rem; }
 .einblicke__band { --luecke: 0.75rem; display: flex; gap: var(--luecke); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: var(--rund); }
@@ -703,9 +704,11 @@ html:has(dialog[open]) { overflow: hidden; }
 .einblicke__knopf svg { width: 1.1rem; height: 1.1rem; }
 @media (max-width: 62rem) {
   .schritt__kopf, .schritt__text, .faelle { grid-column: 1 / -1; grid-row: auto; }
+  .faelle { grid-template-rows: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .einblicke__band li { flex-basis: calc((100% - var(--luecke)) / 2); }
 }
 @media (max-width: 36rem) { .einblicke__band li { flex-basis: 78%; } }
+@media (max-width: 40rem) { .faelle { grid-template-columns: minmax(0, 1fr); } }
 }
 
 /* ───────── Fragen ───────── */
@@ -840,7 +843,7 @@ body { font-size: 1.0625rem; line-height: 1.62; }
 .film__name { font-size: 1rem; font-weight: 600; letter-spacing: 0; line-height: 1.2; overflow-wrap: break-word; min-width: 0; }
 .film__art { font-size: 0.875rem; }
 .film__zeit { font-size: 0.875rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-.faelle h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+
 .frage summary { font-size: clamp(1.125rem, 1.45vw, 1.3125rem); font-weight: 600; letter-spacing: -0.005em; line-height: 1.25; padding-block: 1.25rem; }
 .prosa h2 { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; }
 .fragen__hinweis, .fuss { font-size: 0.9375rem; }
