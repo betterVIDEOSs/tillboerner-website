@@ -4,12 +4,15 @@
  * Liefert der Website die freien Zeiten aus dem Google Kalender (GET)
  * und trägt gebuchte Kennenlerngespräche ein (POST).
  *
- * Einrichten: script.google.com → Neues Projekt → diesen Code einfügen →
- * links bei „Dienste“ auf + klicken und „Google Calendar API“ hinzufügen
- * (nötig für den Google-Meet-Link) → oben die Funktion „einrichten“ auswählen und
- * einmal auf „Ausführen“ klicken (schaltet die Erinnerungs-Mails ein) → Bereitstellen → Neue Bereitstellung → Typ „Web-App“,
- * Ausführen als „Ich“, Zugriff „Jeder“. Die Adresse der Web-App kommt in
- * index.html an den Knopf: data-buchen-api="…".
+ * Einrichten (einmalig, etwa fünf Minuten):
+ *   1. script.google.com → „Neues Projekt“, den Beispielcode durch diesen Code ersetzen.
+ *   2. Links bei „Dienste“ auf + klicken, „Google Calendar API“ wählen, „Hinzufügen“
+ *      (nötig für den Google-Meet-Link).
+ *   3. „Bereitstellen“ → „Neue Bereitstellung“ → Typ „Web-App“,
+ *      Ausführen als „Ich“, Zugriff „Jeder“. Die Berechtigungen bestätigen.
+ *   4. Die Web-App-URL (endet auf /exec) kommt in index.html an den Knopf: data-buchen-api="…".
+ * Die Erinnerungs-Mails schalten sich beim ersten Aufruf von selbst ein.
+ * Prüfen: Web-App-URL mit ?pruefen=1 aufrufen – zeigt, ob Dienst und Erinnerungen bereit sind.
  */
 
 const ZONE = 'Europe/Berlin';
@@ -21,7 +24,11 @@ const VORLAUF_STD = 12;      // frühestens in 12 Stunden
 const PUFFER_MIN = 15;       // Abstand zu anderen Terminen
 const MAX_PRO_TAG = 8;       // Schutz vor Missbrauch: höchstens so viele Buchungen pro Kalendertag
 
-function doGet() {
+function doGet(e) {
+  const erinnerungen = erinnerungenSichern();
+  if (e && e.parameter && e.parameter.pruefen) {
+    return antwort({ ok: true, meetDienst: typeof Calendar !== 'undefined', erinnerungen: erinnerungen, zone: ZONE });
+  }
   return antwort({ tage: freieTage() });
 }
 
@@ -35,6 +42,8 @@ function doPost(e) {
     && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     && /^\d{4}-\d{2}-\d{2}$/.test(d.datum) && /^\d{2}:00$/.test(d.zeit);
   if (!gueltig) return antwort({ ok: false, grund: 'eingabe' });
+
+  if (typeof Calendar === 'undefined') return antwort({ ok: false, grund: 'dienst' }); // Dienst „Google Calendar API“ fehlt
 
   const sperre = LockService.getScriptLock();
   sperre.waitLock(15000);
@@ -80,7 +89,20 @@ function doPost(e) {
   }
 }
 
-/** Einmal von Hand ausführen: prüft alle 15 Minuten, ob Erinnerungen fällig sind. */
+/** Schaltet die Erinnerungen beim ersten Aufruf der Web-App ein; danach merkt sich das Skript, dass sie laufen. */
+function erinnerungenSichern() {
+  try {
+    const merker = PropertiesService.getScriptProperties();
+    if (merker.getProperty('erinnerungen') === 'an') return true;
+    einrichten();
+    merker.setProperty('erinnerungen', 'an');
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+/** Legt den Zeitplan an: alle 15 Minuten prüfen, ob Erinnerungen fällig sind. Läuft von selbst, kann aber auch von Hand gestartet werden. */
 function einrichten() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
     if (t.getHandlerFunction() === 'erinnern') ScriptApp.deleteTrigger(t);
