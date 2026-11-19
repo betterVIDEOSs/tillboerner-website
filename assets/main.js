@@ -394,28 +394,28 @@
   const buchen = document.querySelector('[data-buchen]');
   if (buchen && typeof HTMLDialogElement === 'function') {
     let buchung = null;
-    buchen.addEventListener('click', (e) => {
-      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-      e.preventDefault();
+    const bereite = () => {
       if (!buchung) {
         const api = buchen.dataset.buchenApi;
         buchung = api ? baueTermin(api) : baueRahmen(buchen.href);
         document.body.append(buchung);
         buchung.addEventListener('click', (ev) => { if (ev.target === buchung) buchung.close(); });
       }
-      buchung.showModal();
-      if (buchung.los) buchung.los();
-    });
-  }
-
-  // Weitere Knöpfe (z. B. „Anfrage senden“ im Hero) öffnen denselben Dialog; ohne Skript springen sie zum Kontakt.
-  if (buchen && typeof HTMLDialogElement === 'function') {
-    document.querySelectorAll('[data-buchen-auf]').forEach((k) => {
+      return buchung;
+    };
+    // Schon beim Ansteuern eines Knopfs (Maus darüber, Finger darauf, Tastaturfokus) holt der Dialog die freien Zeiten,
+    // damit sie beim Klick meist schon da sind.
+    const vorladen = () => { if (buchen.dataset.buchenApi) bereite().los(); };
+    // Der Hauptknopf und alle weiteren (z. B. „Anfrage senden“ im Hero) öffnen denselben Dialog; ohne Skript führen ihre Links weiter.
+    [buchen, ...document.querySelectorAll('[data-buchen-auf]')].forEach((k) => {
       k.addEventListener('click', (e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey) return;
         e.preventDefault();
-        buchen.click();
+        const d = bereite();
+        d.showModal();
+        if (d.los) d.los();
       });
+      ['pointerenter', 'touchstart', 'focus'].forEach((art) => k.addEventListener(art, vorladen, { passive: true }));
     });
   }
 
@@ -458,7 +458,11 @@
     const datum = (iso) => { const [j, m, t] = iso.split('-').map(Number); return new Date(j, m - 1, t); };
     const lang = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
     const kurzTag = (iso) => datum(iso).toLocaleDateString('de-DE', { weekday: 'short' }).replace(/\.$/, '');
-    const mitZeiten = (tage) => (tage || []).filter((t) => t.zeiten && t.zeiten.length).slice(0, 10);
+    // Gespräche beginnen spätestens um 19:00 Uhr und enden damit vor 20 Uhr.
+    const LETZTER_BEGINN = 19;
+    const mitZeiten = (tage) => (tage || [])
+      .map((t) => ({ datum: t.datum, zeiten: (t.zeiten || []).filter((z) => parseInt(z, 10) <= LETZTER_BEGINN) }))
+      .filter((t) => t.zeiten.length).slice(0, 10);
 
     function zeige(titel, teile, fokus) {
       const h = el('h2', 'termin__titel', titel);
@@ -475,14 +479,25 @@
       return p;
     }
 
+    // Während der Kalender antwortet, steht die Ansicht schon da: Überschrift und Platzhalter für die Tage.
     async function lade() {
-      zeige('Einen Moment …', [el('p', 'termin__text', 'Ich schaue in meinen Kalender.')]);
+      if (stand.laedt) return;
+      stand.laedt = true;
+      const band = el('div', 'termin__band');
+      band.setAttribute('aria-hidden', 'true');
+      for (let i = 0; i < 8; i++) band.append(el('span', 'termin__kap termin__kap--leer'));
+      const warte = el('p', 'termin__text termin__warte', 'Ich schaue in meinen Kalender …');
+      warte.setAttribute('role', 'status');
+      zeige('Wann passt es Ihnen?', [el('p', 'termin__text', '30 Minuten per Google Meet, unverbindlich.'), band, warte]);
       try {
         const r = await fetch(api, { redirect: 'follow' });
         const j = await r.json();
         stand.tage = mitZeiten(j.tage);
+        stand.geladen = Date.now();
+        stand.laedt = false;
         terminWahl();
       } catch (err) {
+        stand.laedt = false;
         zeige('Das hat leider nicht geklappt.', [hinweis('Der Kalender ist gerade nicht erreichbar.')]);
       }
     }
@@ -512,7 +527,7 @@
 
       const spalten = el('div', 'termin__spalten');
       const zeitKnoepfe = [];
-      [['Mittags', 0, 15], ['Nachmittags', 15, 19], ['Abends', 19, 24]].forEach(([name, von, bis]) => {
+      [['Mittags', 0, 14], ['Nachmittags', 14, 17], ['Abends', 17, 24]].forEach(([name, von, bis]) => {
         const sp = el('div', 'termin__spalte');
         sp.append(el('p', '', name));
         const zeiten = stand.tag.zeiten.filter((z) => { const h = parseInt(z, 10); return h >= von && h < bis; });
@@ -624,9 +639,11 @@
         zu]);
     }
 
-    // Beim Öffnen: frisch laden, außer man steckt mitten in der Auswahl.
+    // Beim Öffnen und Vorladen: frisch laden, wenn noch nichts da ist, eine Buchung durch ist
+    // oder die Zeiten älter als zwei Minuten sind und noch nichts gewählt wurde.
     d.los = () => {
       if (stand.gebucht) { stand.gebucht = false; stand.tag = null; stand.zeit = null; stand.tage = null; }
+      if (stand.tage && !stand.zeit && Date.now() - stand.geladen > 120000) { stand.tage = null; stand.tag = null; }
       if (!stand.tage) lade();
     };
     return d;

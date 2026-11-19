@@ -443,6 +443,14 @@ html:has(dialog[open]) { overflow: hidden; }
 .termin__kap span { font-family: var(--ui); font-weight: 600; font-size: 0.875rem; color: var(--tinte-leise); }
 .termin__kap b { font-family: var(--display); font-weight: 400; font-size: 2.1rem; line-height: 1; }
 .termin__kap[aria-pressed="true"] { background: var(--tinte); color: var(--hell); }
+/* Platzhalter, solange der Kalender antwortet */
+.termin__kap--leer { background: #fff; opacity: 0.55; }
+.termin__warte { margin-top: 1.5rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .termin__kap--leer { animation: warten 1.2s ease-in-out infinite alternate; }
+  .termin__kap--leer:nth-child(2n) { animation-delay: 0.3s; }
+  @keyframes warten { from { opacity: 0.3; } to { opacity: 0.7; } }
+}
 .termin__kap[aria-pressed="true"] span { color: #c6ddf5; }
 /* Uhrzeiten als Liste in drei Spalten */
 .termin__spalten { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(1.25rem, 2.6vw, 2.25rem); margin-top: 1.5rem; }

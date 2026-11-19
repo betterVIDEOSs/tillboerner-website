@@ -18,7 +18,7 @@
 const ZONE = 'Europe/Berlin';
 const DAUER_MIN = 30;        // Länge eines Gesprächs
 const VON_UHR = 11;          // erster Termin beginnt um 11:00
-const BIS_UHR = 23;          // letzter Termin beginnt um 22:00
+const BIS_UHR = 20;          // letzter Termin beginnt um 19:00 und endet vor 20 Uhr
 const TAGE_VORAUS = 14;      // buchbar sind die nächsten zwei Wochen
 const VORLAUF_STD = 12;      // frühestens in 12 Stunden
 const PUFFER_MIN = 15;       // Abstand zu anderen Terminen
@@ -48,7 +48,7 @@ function doPost(e) {
   const sperre = LockService.getScriptLock();
   sperre.waitLock(15000);
   try {
-    const tage = freieTage();
+    const tage = freieTage(true); // frisch aus dem Kalender, nicht aus dem Zwischenspeicher
     const tag = tage.filter(function (t) { return t.datum === d.datum; })[0];
     if (!tag || tag.zeiten.indexOf(d.zeit) < 0) return antwort({ ok: false, grund: 'vergeben', tage: tage });
 
@@ -78,6 +78,7 @@ function doPost(e) {
       reminders: { useDefault: true }
     }, 'primary', { conferenceDataVersion: 1, sendUpdates: 'all' });
     const meet = termin.hangoutLink || '';
+    CacheService.getScriptCache().remove('tage');
     merker.setProperty(heute, String(anzahl + 1));
 
     const wann = Utilities.formatDate(start, ZONE, "dd.MM.yyyy 'um' HH:mm 'Uhr'");
@@ -155,19 +156,29 @@ function erinnern() {
   });
 }
 
-/** Die Werktage der nächsten zwei Wochen mit ihren freien Startzeiten, z. B. { datum: '2026-11-19', zeiten: ['11:00', '14:00'] } */
-function freieTage() {
-  const kalender = CalendarApp.getDefaultCalendar();
+/**
+ * Die Werktage der nächsten zwei Wochen mit ihren freien Startzeiten, z. B. { datum: '2026-11-19', zeiten: ['11:00', '14:00'] }.
+ * Eine einzige Abfrage an den Kalender liefert alle belegten Zeiträume. Einträge, die als „frei“ markiert oder abgesagt sind,
+ * zählen dabei nicht als belegt. Das Ergebnis wird eine Minute zwischengespeichert, damit die Website schnell antwortet.
+ */
+function freieTage(frisch) {
+  const speicher = CacheService.getScriptCache();
+  if (!frisch) {
+    const gemerkt = speicher.get('tage');
+    if (gemerkt) return JSON.parse(gemerkt);
+  }
   const jetzt = new Date();
   const fruehestens = jetzt.getTime() + VORLAUF_STD * 3600000;
+  const bis = new Date(jetzt.getTime() + (TAGE_VORAUS + 1) * 86400000);
+  const abfrage = Calendar.Freebusy.query({ timeMin: jetzt.toISOString(), timeMax: bis.toISOString(), items: [{ id: 'primary' }] });
+  const belegt = (((abfrage.calendars || {}).primary || {}).busy || []).map(function (b) {
+    return [new Date(b.start).getTime() - PUFFER_MIN * 60000, new Date(b.end).getTime() + PUFFER_MIN * 60000];
+  });
   const tage = [];
   for (let i = 0; i <= TAGE_VORAUS; i++) {
     const tag = new Date(jetzt.getTime() + i * 86400000);
     const datum = Utilities.formatDate(tag, ZONE, 'yyyy-MM-dd');
     if (Number(Utilities.formatDate(tag, ZONE, 'u')) > 5) continue; // 6 = Samstag, 7 = Sonntag
-    const belegt = kalender.getEvents(zeitpunkt(datum, 0), zeitpunkt(datum, 24)).filter(blockiert).map(function (t) {
-      return [t.getStartTime().getTime() - PUFFER_MIN * 60000, t.getEndTime().getTime() + PUFFER_MIN * 60000];
-    });
     const zeiten = [];
     for (let h = VON_UHR; h < BIS_UHR; h++) {
       const start = zeitpunkt(datum, h).getTime();
@@ -178,18 +189,11 @@ function freieTage() {
     }
     tage.push({ datum: datum, zeiten: zeiten });
   }
+  speicher.put('tage', JSON.stringify(tage), 60);
   return tage;
 }
 
-/** Ein Kalendereintrag blockiert, wenn er als „Beschäftigt“ gilt und nicht abgesagt wurde. */
-function blockiert(termin) {
-  try { if (termin.getTransparency() === CalendarApp.EventTransparency.TRANSPARENT) return false; } catch (err) {}
-  try { if (termin.getMyStatus() === CalendarApp.GuestStatus.NO) return false; } catch (err) {}
-  return true;
-}
-
 function zeitpunkt(datum, stunde) {
-  if (stunde >= 24) return new Date(zeitpunkt(datum, 0).getTime() + 86400000);
   return Utilities.parseDate(datum + ' ' + (stunde < 10 ? '0' : '') + stunde + ':00', ZONE, 'yyyy-MM-dd HH:mm');
 }
 
