@@ -42,7 +42,7 @@ Lokale Vorschau: `python3 -m http.server 4173` im Projektordner, dann http://loc
 
 ## Technische Hinweise
 
-- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=5`, `assets/main.js?v=5`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen vier HTML-Dateien hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
+- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=6`, `assets/main.js?v=6`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen vier HTML-Dateien hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
 - Terminbuchung: Der Knopf mit `data-buchen` öffnet den Dialog, Knöpfe mit `data-buchen-auf` öffnen denselben. Mit `data-buchen-api` (Adresse des Apps-Script aus `apps-script/buchung.gs`) läuft die eigene Buchung; ohne zeigt der Dialog rechts die Buchungsseite von Google.
 
 - Elfsight-Widget: `main.js` misst die Karten und setzt `grid-row`, damit sie lückenlos stapeln. Das Raster des Widgets muss `display: grid` bleiben, sonst lädt es nur drei statt sechs Karten.

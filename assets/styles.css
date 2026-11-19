@@ -708,16 +708,14 @@ html:has(dialog[open]) { overflow: hidden; }
 
 /* ───────── Fragen ───────── */
 .fragen { background: var(--flaeche); }
-.fragen__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.5rem 1.5rem; align-items: start; }
-.fragen__kopf { grid-column: 1 / 6; position: sticky; top: calc(var(--kopf) + 2rem); }
+.fragen__raster { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto 1fr; gap: 2.5rem 1.5rem; align-items: start; }
+.fragen__kopf { grid-column: 1 / 6; grid-row: 1; }
 .fragen__kopf .gross { margin-top: 1rem; }
-/* Till freigestellt vor einem hellblauen Bogen: Kopf und Kamera ragen oben heraus, unten schließt der Bogen ab */
-.portraet { display: grid; gap: 1.75rem; margin-top: 2rem; }
-.portraet p { font-size: 1rem; line-height: 1.4; }
-.portraet__figur { position: relative; width: min(19rem, 100%); height: min(23rem, 46svh); clip-path: inset(-50% -20% 0 -20% round 0 0 var(--rund) var(--rund)); }
-.portraet__figur::before { content: ""; position: absolute; inset: 30% 0 0 0; background: var(--zweit); border-radius: 10rem 10rem var(--rund) var(--rund); }
-.portraet__figur img { position: absolute; bottom: 0; left: 46%; translate: -50% 0; height: 100%; width: auto; max-width: none; }
-.fragen__liste { grid-column: 6 / 13; }
+.fragen__hinweis { margin-top: 2rem; font-size: 1rem; line-height: 1.4; }
+/* Till freigestellt, ohne Form dahinter. Er steht fest am unteren Rand des Abschnitts und wandert beim Scrollen nicht mit. */
+.fragen__figur { grid-column: 1 / 6; grid-row: 2; align-self: end; margin-bottom: calc(-1 * var(--abstand)); }
+.fragen__figur img { display: block; width: auto; height: min(30rem, 34vw); max-width: 100%; object-fit: contain; object-position: left bottom; }
+.fragen__liste { grid-column: 6 / 13; grid-row: 1 / span 2; }
 .frage { border-top: 1px solid var(--linie); }
 .frage:last-child { border-bottom: 1px solid var(--linie); }
 .frage summary {
@@ -738,8 +736,9 @@ html:has(dialog[open]) { overflow: hidden; }
 .frage__antwort li { padding-left: 1.2em; position: relative; max-width: 60ch; }
 .frage__antwort li::before { content: "–"; position: absolute; left: 0; color: var(--akzent); }
 @media (max-width: 62rem) {
-  .fragen__kopf { grid-column: 1 / -1; position: static; }
-  .fragen__liste { grid-column: 1 / -1; }
+  .fragen__kopf, .fragen__liste, .fragen__figur { grid-column: 1 / -1; grid-row: auto; }
+  .fragen__figur { order: 3; margin-top: 1rem; }
+  .fragen__figur img { height: min(24rem, 90vw); margin-inline: auto; }
 }
 
 /* ───────── Finale / Kontakt ─────────
@@ -842,7 +841,7 @@ body { font-size: 1.0625rem; line-height: 1.62; }
 .faelle h3 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
 .frage summary { font-size: clamp(1.125rem, 1.45vw, 1.3125rem); font-weight: 600; letter-spacing: -0.005em; line-height: 1.25; padding-block: 1.25rem; }
 .prosa h2 { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; }
-.portraet p, .fuss { font-size: 0.9375rem; }
+.fragen__hinweis, .fuss { font-size: 0.9375rem; }
 @media (max-width: 62rem) {
   .nav a { font-size: 1.5rem; }
 }
