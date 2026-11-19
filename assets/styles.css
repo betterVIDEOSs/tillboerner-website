@@ -345,12 +345,11 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .manifest__los {
   margin: 0; max-width: none; padding: clamp(1.5rem, 3vw, 2.75rem); border-radius: var(--rund);
   background: var(--akzent); color: var(--auf-akzent);
-  font-family: var(--ui); font-weight: 600; font-size: clamp(1.1875rem, 1.75vw, 1.5625rem); line-height: 1.38; text-wrap: pretty;
+  font-family: var(--ui); font-weight: 600; font-size: clamp(1.25rem, 1.9vw, 1.7rem); line-height: 1.38; text-wrap: pretty;
 }
-/* Die Pointe ist dunkelblau markiert wie mit einem Textmarker, aber nur wenig größer als die Frage davor:
-   Beide sollen als ein Gedanke gelesen werden, nicht die Pointe allein. */
-.manifest__los strong { display: block; margin-top: 0.7em; font-family: var(--display); font-weight: 400; font-size: 1.3em; line-height: 1.45; text-wrap: balance; }
-.manifest__los strong span { padding: 0.06em 0.34em 0.14em; margin-left: -0.1em; border-radius: 0.26em; background: var(--grund); color: var(--schrift); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+/* Frage und Antwort sind gleich groß und lesen sich als ein Gedanke; die Antwort ist nur fett und kräftig unterstrichen. */
+.manifest__los strong { display: block; margin-top: 0.55em; font-weight: 700; }
+.manifest__los strong span { text-decoration: underline; text-decoration-thickness: 0.13em; text-underline-offset: 0.22em; }
 .manifest__till { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: clamp(1.25rem, 2.4vw, 2rem); }
 .manifest__foto { position: relative; min-height: clamp(16rem, 24vw, 24rem); border-radius: var(--rund); overflow: hidden; background: var(--flaeche); }
 .manifest__bild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
