@@ -6,6 +6,7 @@ Statische Website ohne Build-Schritt. Live unter https://tillboerner.com.
 
 - `index.html` – Startseite (Showreel, Kundenlogos, Manifest, Filme, Hochformat, Ablauf, Garantie, Kundenstimmen, Fragen, Kontakt)
 - `impressum.html`, `datenschutz.html`, `links.html`
+- `robots.txt`, `sitemap.xml` (bei neuen Seiten ergänzen, `lastmod` anpassen), `404.html`
 - `assets/styles.css`, `assets/main.js` – ein Stylesheet, ein Skript, keine Abhängigkeiten
 - `assets/img/`, `assets/filme/` (Vorschaubilder), `assets/logos/` (Kundenlogos), `assets/fonts/` (Gloock, Albert Sans, lokal eingebunden)
 - `CNAME`, `.nojekyll` – für GitHub Pages, nicht löschen
@@ -42,7 +43,9 @@ Lokale Vorschau: `python3 -m http.server 4173` im Projektordner, dann http://loc
 
 ## Technische Hinweise
 
-- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=12`, `assets/main.js?v=12`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen vier HTML-Dateien hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
+- Strukturierte Daten stehen als JSON-LD im Kopf von `index.html` (Betrieb, Person, Website, FAQ). Die FAQ-Einträge dort sind eine Kopie der Fragen im Abschnitt „Noch Fragen?“: Ändert sich dort ein Text, muss er im JSON-LD mitgeändert werden.
+
+- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=13`, `assets/main.js?v=13`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen HTML-Dateien (auch `404.html`) hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
 - Terminbuchung: Der Knopf mit `data-buchen` öffnet den Dialog, Knöpfe mit `data-buchen-auf` öffnen denselben. Mit `data-buchen-api` (Adresse des Apps-Script aus `apps-script/buchung.gs`) läuft die eigene Buchung; ohne zeigt der Dialog rechts die Buchungsseite von Google.
 
 - Elfsight-Widget: `main.js` misst die Karten und setzt `grid-row`, damit sie lückenlos stapeln. Das Raster des Widgets muss `display: grid` bleiben, sonst lädt es nur drei statt sechs Karten.

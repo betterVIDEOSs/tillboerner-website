@@ -3,11 +3,11 @@
   const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const breit = matchMedia('(min-width: 62rem)');
 
-  /* ── Showreel im Hero: läuft stumm und in Schleife, sobald die Seite steht.
+  /* ── Showreel im Hero: läuft stumm und in Schleife, sobald die Seite fertig geladen ist.
         Wer reduzierte Bewegung oder Datensparen eingestellt hat, sieht stattdessen das Foto. ── */
   const film = document.querySelector('[data-showreel]');
   const sparen = navigator.connection && navigator.connection.saveData;
-  if (film && !ruhig && !sparen) {
+  const starteShowreel = () => {
     const id = film.dataset.showreel;
     const f = document.createElement('iframe');
     f.src = `https://player.vimeo.com/video/${id}?background=1&autoplay=1&muted=1&loop=1&autopause=0&playsinline=1&dnt=1`;
@@ -26,6 +26,10 @@
       if (m.event === 'playProgress' && m.data && m.data.seconds > 0.2) f.classList.add('laeuft');
     });
     film.append(f);
+  };
+  // Erst wenn die Seite selbst fertig geladen ist, damit das Video dem ersten Bild keine Bandbreite nimmt.
+  if (film && !ruhig && !sparen) {
+    if (document.readyState === 'complete') starteShowreel(); else addEventListener('load', starteShowreel, { once: true });
   }
 
   /* ── Kundenlogos: Band verdoppeln, damit es nahtlos durchläuft ── */

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /apps-script/
+Disallow: /CLAUDE.md
+
+Sitemap: https://tillboerner.com/sitemap.xml
