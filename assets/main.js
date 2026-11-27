@@ -4,9 +4,9 @@
   const breit = matchMedia('(min-width: 62rem)');
 
   /* ── Einwilligung für externe Inhalte ──
-        Vimeo (Showreel und Filme) und das Bewertungs-Widget von Elfsight laden erst, wenn Besucher zustimmen.
+        Die Filme von Vimeo und das Bewertungs-Widget von Elfsight laden erst, wenn Besucher zustimmen.
         Die Auswahl liegt im localStorage des Browsers (technisch notwendig, § 25 Abs. 2 Nr. 2 TDDDG) und wird nirgends hin gesendet.
-        Ohne Zustimmung bleibt das Standbild im Hero stehen, Filme fragen vor dem Abspielen nach, die Bewertungen zeigen einen Platzhalter. */
+        Ohne Zustimmung fragen Filme vor dem Abspielen nach, die Bewertungen zeigen einen Platzhalter. Das Showreel im Hero kommt vom eigenen Server. */
   const EINWILLIGUNG = 'tb-einwilligung';
   let auswahl = null;
   try { auswahl = JSON.parse(localStorage.getItem(EINWILLIGUNG)); } catch (_) { auswahl = null; }
@@ -24,34 +24,40 @@
     });
   }
 
-  /* ── Showreel im Hero: läuft stumm und in Schleife, sobald die Seite fertig geladen ist.
+  /* ── Showreel im Hero: eigene Videodatei, läuft stumm und in Schleife, sobald die Seite fertig geladen ist.
         Wer reduzierte Bewegung oder Datensparen eingestellt hat, sieht stattdessen das Foto. ── */
   const film = document.querySelector('[data-showreel]');
   const sparen = navigator.connection && navigator.connection.saveData;
   const starteShowreel = () => {
-    const id = film.dataset.showreel;
-    const f = document.createElement('iframe');
-    f.src = `https://player.vimeo.com/video/${id}?background=1&autoplay=1&muted=1&loop=1&autopause=0&playsinline=1&dnt=1`;
-    f.title = 'Showreel, läuft ohne Ton';
-    f.allow = 'autoplay';
-    f.tabIndex = -1;
-    f.setAttribute('aria-hidden', 'true');
-    // Erst einblenden, wenn das Video wirklich läuft. Meldet der Player nichts (gesperrt, offline,
-    // Fehlerseite), bleibt einfach das Foto stehen.
-    const sag = (was) => f.contentWindow.postMessage(JSON.stringify(was), 'https://player.vimeo.com');
-    addEventListener('message', (e) => {
-      if (e.source !== f.contentWindow || e.origin !== 'https://player.vimeo.com') return;
-      let m = e.data;
-      try { if (typeof m === 'string') m = JSON.parse(m); } catch (_) { return; }
-      if (m.event === 'ready') sag({ method: 'addEventListener', value: 'playProgress' });
-      if (m.event === 'playProgress' && m.data && m.data.seconds > 0.2) f.classList.add('laeuft');
-    });
-    film.append(f);
+    const v = document.createElement('video');
+    v.muted = true;
+    v.defaultMuted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    v.setAttribute('aria-hidden', 'true');
+    v.disablePictureInPicture = true;
+    v.tabIndex = -1;
+    v.preload = 'auto';
+    // Auf kleinen Bildschirmen reicht die 720p-Fassung (halb so groß).
+    v.src = `assets/video/showreel-${matchMedia('(max-width: 48rem)').matches ? 720 : 1080}.mp4`;
+    // Erst einblenden, wenn das Video wirklich läuft und über das erste, schwarze Bild hinaus ist.
+    // Spielt der Browser nicht ab (Stromsparmodus, gesperrt), bleibt einfach das Foto stehen.
+    const zeige = () => { if (v.currentTime > 0.3) { v.classList.add('laeuft'); v.removeEventListener('timeupdate', zeige); } };
+    v.addEventListener('timeupdate', zeige);
+    film.append(v);
+    const los = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    los();
+    // Außerhalb des Bildes pausieren, damit das Video beim Lesen weiter unten keine Rechenzeit kostet.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => { if (e.isIntersecting) los(); else v.pause(); }).observe(film);
+    }
   };
   // Erst wenn die Seite selbst fertig geladen ist, damit das Video dem ersten Bild keine Bandbreite nimmt.
   if (film && !ruhig && !sparen) {
-    const wennGeladen = () => { if (document.readyState === 'complete') starteShowreel(); else addEventListener('load', starteShowreel, { once: true }); };
-    if (erlaubt('vimeo')) wennGeladen(); else beiErlaubnis.vimeo.push(wennGeladen);
+    // Das Showreel kommt vom eigenen Server; dafür ist keine Zustimmung nötig.
+    if (document.readyState === 'complete') starteShowreel(); else addEventListener('load', starteShowreel, { once: true });
   }
 
   /* ── Kundenlogos: Band verdoppeln, damit es nahtlos durchläuft ── */
@@ -698,7 +704,7 @@
   });
 
   /* ── Abfrage-Leiste und Nachfrage vor Filmen ── */
-  const hatExterne = !!document.querySelector('[data-showreel], [data-vimeo], [data-bewertungen]');
+  const hatExterne = !!document.querySelector('[data-vimeo], [data-bewertungen]');
   let leiste = null;
   function zeigeLeiste() {
     if (!leiste) {
@@ -706,7 +712,7 @@
       leiste.className = 'einwilligung';
       leiste.setAttribute('aria-labelledby', 'einwilligung-titel');
       leiste.innerHTML = '<h2 id="einwilligung-titel">Externe Inhalte</h2>'
-        + '<p>Diese Website setzt selbst keine Cookies. Das Showreel und die Filme kommen von Vimeo, die Google-Bewertungen über Elfsight. Wenn Sie zustimmen, erhalten diese Anbieter unter anderem Ihre IP-Adresse, Daten können in die USA übertragen werden, und sie können Cookies setzen. Ihre Auswahl können Sie jederzeit unten auf der Seite ändern. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>'
+        + '<p>Diese Website setzt selbst keine Cookies. Die Filme kommen von Vimeo, die Google-Bewertungen über Elfsight. Wenn Sie zustimmen, erhalten diese Anbieter unter anderem Ihre IP-Adresse, Daten können in die USA übertragen werden, und sie können Cookies setzen. Ihre Auswahl können Sie jederzeit unten auf der Seite ändern. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>'
         + '<fieldset class="einwilligung__auswahl" hidden><legend>Auswahl</legend>'
         + '<label><input type="checkbox" name="vimeo"> Videos von Vimeo</label>'
         + '<label><input type="checkbox" name="elfsight"> Google-Bewertungen über Elfsight</label></fieldset>'

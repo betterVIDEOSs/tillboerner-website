@@ -266,13 +266,9 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .hero__film { position: absolute; inset: 0; z-index: -2; container-type: size; overflow: hidden; }
 .hero__film img { width: 100%; height: 100%; object-fit: cover; }
-/* Der Vimeo-Player deckt die Fläche wie object-fit: cover. */
-.hero__film iframe {
-  position: absolute; top: 50%; left: 50%; translate: -50% -50%; scale: 1.02;
-  width: max(100cqw, 177.78cqh); height: max(100cqh, 56.25cqw);
-  border: 0; pointer-events: none; opacity: 0; transition: opacity 1.4s;
-}
-.hero__film iframe.laeuft { opacity: 1; }
+/* Das Showreel liegt als eigene Videodatei auf dem Server und deckt die Fläche wie das Standbild darunter. */
+.hero__film video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; opacity: 0; transition: opacity 1.4s; }
+.hero__film video.laeuft { opacity: 1; }
 /* Verlauf, damit Titel und Knöpfe vor jedem Bild lesbar bleiben */
 .hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
