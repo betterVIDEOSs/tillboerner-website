@@ -30,7 +30,7 @@ Lokale Vorschau: `python3 -m http.server 4173` im Projektordner, dann http://loc
 - Dezente Bewegung beim Scrollen ist erwünscht; `prefers-reduced-motion` wird überall beachtet.
 - Hero: Das Showreel liegt als eigene Datei in `assets/video/` (`showreel-1080.mp4`, `showreel-720.mp4` fürs Handy, H.264 ohne Ton) und läuft stumm, automatisch und in Schleife, ohne Knopf für Ton. Es braucht deshalb keine Einwilligung. Original war Vimeo `1179386478`. Im Titel „Telling your Story.“ stehen T, y und S optisch auf einer Achse (Randausgleich per `margin-left` in `em`).
 - Logo-Band: läuft ohne Pause, Logos farbig, beim Überfahren größer.
-- Manifest: Tills Foto mit der Mission als Zitat darunter. Der Satz „Wie das geht, steht direkt hier drunter.“ kommt nicht wieder.
+- Manifest: Tills Foto mit der Mission als Zitat darunter. Der Kasten unter der Überschrift ist dunkelblau (`--flaeche`), nicht pink; „Dann sind Sie bei mir falsch!“ ist fett und pink unterstrichen. Der Satz „Wie das geht, steht direkt hier drunter.“ kommt nicht wieder.
 - Filme: Der Knopf heißt „Projekte im Überblick“ – nicht „Alle Filme“ und keine Anzahl nennen, es gibt mehr Projekte als gezeigt. Solange der Dialog offen ist, scrollt die Seite nicht.
 - Hochformat: keine eingekreisten Wörter.
 - Garantie: Der Stempel wird beim ersten Herunterscrollen „aufgedrückt“ (Klassen `wartet` / `drauf`, Keyframes `stempeln`). „Garantie“ steht nicht in der Navigation.
@@ -45,7 +45,7 @@ Lokale Vorschau: `python3 -m http.server 4173` im Projektordner, dann http://loc
 
 - Strukturierte Daten stehen als JSON-LD im Kopf von `index.html` (Betrieb, Person, Website, FAQ). Die FAQ-Einträge dort sind eine Kopie der Fragen im Abschnitt „Noch Fragen?“: Ändert sich dort ein Text, muss er im JSON-LD mitgeändert werden.
 
-- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=15`, `assets/main.js?v=15`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen HTML-Dateien (auch `404.html`) hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
+- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=16`, `assets/main.js?v=16`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen HTML-Dateien (auch `404.html`) hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
 - Einwilligung: Vimeo (Filme) und Elfsight (Bewertungen) laden nur mit Zustimmung. `main.js` zeigt beim ersten Besuch die Leiste „Externe Inhalte“ und speichert die Auswahl im localStorage unter `tb-einwilligung`; ohne Zustimmung fragt jeder Film vorher nach, die Bewertungen zeigen einen Platzhalter. Knöpfe mit `data-einwilligung-oeffnen` öffnen die Auswahl erneut. Kein externer Dienst darf ohne diese Abfrage eingebunden werden; die Datenschutzerklärung muss jeden Dienst nennen.
 - Terminbuchung: Der Knopf mit `data-buchen` öffnet den Dialog, Knöpfe mit `data-buchen-auf` öffnen denselben; erst der Klick verbindet mit Google, kein Vorladen. Mit `data-buchen-api` (Adresse des Apps-Script aus `apps-script/buchung.gs`) läuft die eigene Buchung; ohne zeigt der Dialog rechts die Buchungsseite von Google.
 

@@ -340,12 +340,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .manifest__titel s { color: var(--leise); text-decoration-line: line-through; text-decoration-color: var(--akzent); text-decoration-thickness: 0.07em; }
 .manifest__los {
   margin: 0; max-width: none; padding: clamp(1.5rem, 3vw, 2.75rem); border-radius: var(--rund);
-  background: var(--akzent); color: var(--auf-akzent);
-  font-family: var(--ui); font-weight: 600; font-size: clamp(1.25rem, 1.9vw, 1.7rem); line-height: 1.38; text-wrap: pretty;
+  background: var(--flaeche); color: var(--schrift);
+  font-family: var(--ui); font-weight: 500; font-size: clamp(1.25rem, 1.9vw, 1.7rem); line-height: 1.38; text-wrap: pretty;
 }
 /* Frage und Antwort sind gleich groß und lesen sich als ein Gedanke; die Antwort ist nur fett und kräftig unterstrichen. */
 .manifest__los strong { display: block; margin-top: 0.55em; font-weight: 700; }
-.manifest__los strong span { text-decoration: underline; text-decoration-thickness: 0.13em; text-underline-offset: 0.22em; }
+.manifest__los strong span { text-decoration: underline; text-decoration-color: var(--akzent); text-decoration-thickness: 0.13em; text-underline-offset: 0.22em; }
 .manifest__till { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: clamp(1.25rem, 2.4vw, 2rem); }
 .manifest__foto { position: relative; min-height: clamp(16rem, 24vw, 24rem); border-radius: var(--rund); overflow: hidden; background: var(--flaeche); }
 .manifest__bild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
