@@ -45,8 +45,9 @@ Lokale Vorschau: `python3 -m http.server 4173` im Projektordner, dann http://loc
 
 - Strukturierte Daten stehen als JSON-LD im Kopf von `index.html` (Betrieb, Person, Website, FAQ). Die FAQ-Einträge dort sind eine Kopie der Fragen im Abschnitt „Noch Fragen?“: Ändert sich dort ein Text, muss er im JSON-LD mitgeändert werden.
 
-- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=13`, `assets/main.js?v=13`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen HTML-Dateien (auch `404.html`) hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
-- Terminbuchung: Der Knopf mit `data-buchen` öffnet den Dialog, Knöpfe mit `data-buchen-auf` öffnen denselben. Mit `data-buchen-api` (Adresse des Apps-Script aus `apps-script/buchung.gs`) läuft die eigene Buchung; ohne zeigt der Dialog rechts die Buchungsseite von Google.
+- Stylesheet und Skript sind mit einer Versionsmarke eingebunden (`assets/styles.css?v=14`, `assets/main.js?v=14`). Bei jeder Änderung an einer der beiden Dateien die Zahl in allen HTML-Dateien (auch `404.html`) hochzählen, sonst zeigen Browser bis zu zehn Minuten lang die alte Fassung.
+- Einwilligung: Vimeo (Showreel, Filme) und Elfsight (Bewertungen) laden nur mit Zustimmung. `main.js` zeigt beim ersten Besuch die Leiste „Externe Inhalte“ und speichert die Auswahl im localStorage unter `tb-einwilligung`; ohne Zustimmung fragt jeder Film vorher nach, die Bewertungen zeigen einen Platzhalter. Knöpfe mit `data-einwilligung-oeffnen` öffnen die Auswahl erneut. Kein externer Dienst darf ohne diese Abfrage eingebunden werden; die Datenschutzerklärung muss jeden Dienst nennen.
+- Terminbuchung: Der Knopf mit `data-buchen` öffnet den Dialog, Knöpfe mit `data-buchen-auf` öffnen denselben; erst der Klick verbindet mit Google, kein Vorladen. Mit `data-buchen-api` (Adresse des Apps-Script aus `apps-script/buchung.gs`) läuft die eigene Buchung; ohne zeigt der Dialog rechts die Buchungsseite von Google.
 
 - Elfsight-Widget: `main.js` misst die Karten und setzt `grid-row`, damit sie lückenlos stapeln. Das Raster des Widgets muss `display: grid` bleiben, sonst lädt es nur drei statt sechs Karten.
 - Kundenlogos: WebP mit Transparenz, 360 × 200 px, freigestellt in Originalfarben. Die Originaldateien und das Aufbereitungsskript liegen nicht im Repository.

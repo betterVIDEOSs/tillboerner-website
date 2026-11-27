@@ -791,6 +791,31 @@ html:has(dialog[open]) { overflow: hidden; }
 .fuss nav { display: flex; flex-wrap: wrap; gap: 0 1.75rem; }
 .fuss a { text-decoration: none; padding-block: 0.6rem; }
 .fuss a:hover { text-decoration: underline; }
+.fuss button { font: inherit; color: inherit; padding-block: 0.6rem; }
+.fuss button:hover { text-decoration: underline; }
+
+/* ───────── Einwilligung für externe Inhalte ───────── */
+.einwilligung { position: fixed; z-index: 150; left: clamp(0.75rem, 2vw, 1.5rem); bottom: clamp(0.75rem, 2vw, 1.5rem); width: min(34rem, calc(100vw - 1.5rem));
+  max-height: calc(100svh - 1.5rem); overflow-y: auto; padding: clamp(1.25rem, 2.4vw, 1.75rem); border-radius: var(--rund);
+  background: var(--flaeche); color: var(--schrift); box-shadow: 0 0 0 1px var(--linie), 0 1.5rem 4rem rgb(var(--schatten) / 0.6); }
+.einwilligung[hidden] { display: none; }
+.einwilligung h2, .einwilligung-film h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.5rem, 2.4vw, 1.875rem); line-height: 1.1; margin: 0 0 0.6rem; }
+.einwilligung p, .einwilligung-film p { margin: 0; font-size: 0.9375rem; line-height: 1.5; color: var(--leise); max-width: none; }
+.einwilligung p a, .einwilligung-film p a { color: var(--schrift); }
+.einwilligung__auswahl { display: grid; gap: 0.5rem; margin: 1rem 0 0; padding: 0; border: 0; }
+.einwilligung__auswahl[hidden] { display: none; }
+.einwilligung__auswahl legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.einwilligung__auswahl label { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; font-size: 1rem; cursor: pointer; }
+.einwilligung__auswahl input { width: 1.15rem; height: 1.15rem; accent-color: var(--akzent); }
+.einwilligung__knoepfe { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.75rem; margin-top: 1.1rem; }
+.einwilligung__mehr { font: inherit; font-weight: 600; font-size: 0.9375rem; color: var(--schrift); text-decoration: underline; text-underline-offset: 3px; padding: 0.4rem 0.2rem; }
+.einwilligung-film { border: 0; width: min(30rem, calc(100vw - 2rem)); padding: clamp(1.25rem, 3vw, 2rem); border-radius: var(--rund); background: var(--flaeche); color: var(--schrift); box-shadow: 0 0 0 1px var(--linie); }
+.einwilligung-film::backdrop { background: rgb(var(--schatten) / 0.8); }
+.einwilligung-film .einwilligung__knoepfe { margin-top: 1.25rem; }
+.bewertungen-frage { display: grid; gap: 1.1rem; justify-items: start; margin-top: clamp(1.5rem, 3vw, 2.5rem); padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: var(--rund); background: var(--flaeche); }
+.bewertungen-frage p { margin: 0; max-width: 60ch; color: var(--leise); }
+.bewertungen-frage p a { color: var(--schrift); }
+@media (max-width: 40rem) { .einwilligung { left: 0.5rem; right: 0.5rem; bottom: 0.5rem; width: auto; } .einwilligung__knoepfe .btn { flex: 1 1 auto; justify-content: center; } }
 
 /* ───────── Unterseiten (Impressum, Datenschutz, Links) ───────── */
 .seite { padding-block: clamp(3rem, 7vw, 6rem) var(--abstand); }

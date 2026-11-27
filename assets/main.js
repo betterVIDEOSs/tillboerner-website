@@ -3,6 +3,27 @@
   const ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const breit = matchMedia('(min-width: 62rem)');
 
+  /* ── Einwilligung für externe Inhalte ──
+        Vimeo (Showreel und Filme) und das Bewertungs-Widget von Elfsight laden erst, wenn Besucher zustimmen.
+        Die Auswahl liegt im localStorage des Browsers (technisch notwendig, § 25 Abs. 2 Nr. 2 TDDDG) und wird nirgends hin gesendet.
+        Ohne Zustimmung bleibt das Standbild im Hero stehen, Filme fragen vor dem Abspielen nach, die Bewertungen zeigen einen Platzhalter. */
+  const EINWILLIGUNG = 'tb-einwilligung';
+  let auswahl = null;
+  try { auswahl = JSON.parse(localStorage.getItem(EINWILLIGUNG)); } catch (_) { auswahl = null; }
+  const erlaubt = (dienst) => !!(auswahl && auswahl[dienst]);
+  const beiErlaubnis = { vimeo: [], elfsight: [] };
+  function speichereAuswahl(neu) {
+    const vorher = auswahl || {};
+    if (leiste) leiste.hidden = true;
+    auswahl = { vimeo: !!neu.vimeo, elfsight: !!neu.elfsight, stand: new Date().toISOString().slice(0, 10) };
+    try { localStorage.setItem(EINWILLIGUNG, JSON.stringify(auswahl)); } catch (_) { /* ohne Speicher gilt die Auswahl bis zum Neuladen */ }
+    // Zurückgenommene Zustimmung: neu laden, damit bereits geladene Inhalte verschwinden.
+    if ((vorher.vimeo && !auswahl.vimeo) || (vorher.elfsight && !auswahl.elfsight)) { location.reload(); return; }
+    ['vimeo', 'elfsight'].forEach((d) => {
+      if (auswahl[d] && !vorher[d]) beiErlaubnis[d].splice(0).forEach((f) => f());
+    });
+  }
+
   /* ── Showreel im Hero: läuft stumm und in Schleife, sobald die Seite fertig geladen ist.
         Wer reduzierte Bewegung oder Datensparen eingestellt hat, sieht stattdessen das Foto. ── */
   const film = document.querySelector('[data-showreel]');
@@ -29,7 +50,8 @@
   };
   // Erst wenn die Seite selbst fertig geladen ist, damit das Video dem ersten Bild keine Bandbreite nimmt.
   if (film && !ruhig && !sparen) {
-    if (document.readyState === 'complete') starteShowreel(); else addEventListener('load', starteShowreel, { once: true });
+    const wennGeladen = () => { if (document.readyState === 'complete') starteShowreel(); else addEventListener('load', starteShowreel, { once: true }); };
+    if (erlaubt('vimeo')) wennGeladen(); else beiErlaubnis.vimeo.push(wennGeladen);
   }
 
   /* ── Kundenlogos: Band verdoppeln, damit es nahtlos durchläuft ── */
@@ -139,7 +161,7 @@
         if (!e.isIntersecting) return;
         wache.disconnect();
         const poster = buehne.querySelector('.poster');
-        if (poster && !kachel && !saal.open) starteAufBuehne(poster.dataset.vimeo, poster.dataset.titel, true);
+        if (poster && !kachel && !saal.open && erlaubt('vimeo')) starteAufBuehne(poster.dataset.vimeo, poster.dataset.titel, true);
       }, { threshold: 0.6 });
       wache.observe(buehne);
     }
@@ -224,14 +246,27 @@
 
   const bewertungen = document.querySelector('[data-bewertungen]');
   if (bewertungen) {
-    new IntersectionObserver(([e], io) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
+    const ladeWidget = () => {
       const skript = document.createElement('script');
       skript.src = 'https://elfsightcdn.com/platform.js';
       skript.async = true;
       document.head.append(skript);
+    };
+    const beobachte = () => new IntersectionObserver(([e], io) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      ladeWidget();
     }, { rootMargin: '800px 0px' }).observe(bewertungen);
+    if (erlaubt('elfsight')) beobachte();
+    else {
+      const platz = document.createElement('div');
+      platz.className = 'bewertungen-frage';
+      platz.innerHTML = '<p>Hier erscheinen die Bewertungen aus meinem Google-Profil. Sie werden über einen Dienst der Elfsight LLC geladen; dabei erhalten Elfsight und Google unter anderem Ihre IP-Adresse, Daten können in die USA übertragen werden. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>'
+        + '<button class="btn" type="button">Bewertungen anzeigen</button>';
+      bewertungen.before(platz);
+      platz.querySelector('button').addEventListener('click', () => speichereAuswahl({ ...(auswahl || {}), elfsight: true }));
+      beiErlaubnis.elfsight.push(() => { platz.remove(); beobachte(); });
+    }
 
     // Karten ohne Lücken stapeln: Jede Bewertung bekommt so viele Rasterzeilen (je 4 px), wie sie hoch ist,
     // plus 20 px Abstand. Neue Karten kommen, die höchste zuerst, in die jeweils kürzeste Spalte –
@@ -407,9 +442,6 @@
       }
       return buchung;
     };
-    // Schon beim Ansteuern eines Knopfs (Maus darüber, Finger darauf, Tastaturfokus) holt der Dialog die freien Zeiten,
-    // damit sie beim Klick meist schon da sind.
-    const vorladen = () => { if (buchen.dataset.buchenApi) bereite().los(); };
     // Der Hauptknopf und alle weiteren (z. B. „Anfrage senden“ im Hero) öffnen denselben Dialog; ohne Skript führen ihre Links weiter.
     [buchen, ...document.querySelectorAll('[data-buchen-auf]')].forEach((k) => {
       k.addEventListener('click', (e) => {
@@ -419,7 +451,6 @@
         d.showModal();
         if (d.los) d.los();
       });
-      ['pointerenter', 'touchstart', 'focus'].forEach((art) => k.addEventListener(art, vorladen, { passive: true }));
     });
   }
 
@@ -665,6 +696,86 @@
     box.querySelector('[data-weiter]').addEventListener('click', () => gehe(band.scrollLeft >= ende() ? 0 : band.scrollLeft + schritt()));
     leiste.hidden = false;
   });
+
+  /* ── Abfrage-Leiste und Nachfrage vor Filmen ── */
+  const hatExterne = !!document.querySelector('[data-showreel], [data-vimeo], [data-bewertungen]');
+  let leiste = null;
+  function zeigeLeiste() {
+    if (!leiste) {
+      leiste = document.createElement('section');
+      leiste.className = 'einwilligung';
+      leiste.setAttribute('aria-labelledby', 'einwilligung-titel');
+      leiste.innerHTML = '<h2 id="einwilligung-titel">Externe Inhalte</h2>'
+        + '<p>Diese Website setzt selbst keine Cookies. Das Showreel und die Filme kommen von Vimeo, die Google-Bewertungen über Elfsight. Wenn Sie zustimmen, erhalten diese Anbieter unter anderem Ihre IP-Adresse, Daten können in die USA übertragen werden, und sie können Cookies setzen. Ihre Auswahl können Sie jederzeit unten auf der Seite ändern. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>'
+        + '<fieldset class="einwilligung__auswahl" hidden><legend>Auswahl</legend>'
+        + '<label><input type="checkbox" name="vimeo"> Videos von Vimeo</label>'
+        + '<label><input type="checkbox" name="elfsight"> Google-Bewertungen über Elfsight</label></fieldset>'
+        + '<div class="einwilligung__knoepfe"><button class="btn btn--kompakt" type="button" data-wahl="alle">Alle erlauben</button>'
+        + '<button class="btn btn--kompakt" type="button" data-wahl="keine">Nur notwendige</button>'
+        + '<button class="einwilligung__mehr" type="button" data-wahl="anpassen">Auswahl anpassen</button></div>';
+      const felder = leiste.querySelector('.einwilligung__auswahl');
+      leiste.addEventListener('click', (e) => {
+        const k = e.target.closest('[data-wahl]');
+        if (!k) return;
+        const wahl = k.dataset.wahl;
+        if (wahl === 'anpassen') {
+          felder.hidden = false;
+          k.dataset.wahl = 'speichern';
+          k.textContent = 'Auswahl speichern';
+          felder.querySelector('input').focus();
+          return;
+        }
+        const neu = wahl === 'alle' ? { vimeo: true, elfsight: true }
+          : wahl === 'keine' ? { vimeo: false, elfsight: false }
+          : { vimeo: felder.elements.vimeo.checked, elfsight: felder.elements.elfsight.checked };
+        leiste.hidden = true;
+        speichereAuswahl(neu);
+      });
+      const sprung = document.querySelector('.skip');
+      if (sprung) sprung.after(leiste); else document.body.prepend(leiste);
+    }
+    const felder = leiste.querySelector('.einwilligung__auswahl');
+    felder.elements.vimeo.checked = erlaubt('vimeo');
+    felder.elements.elfsight.checked = erlaubt('elfsight');
+    leiste.hidden = false;
+  }
+  if (hatExterne && !auswahl) zeigeLeiste();
+  document.querySelectorAll('[data-einwilligung-oeffnen]').forEach((k) => {
+    k.hidden = false;
+    k.addEventListener('click', (e) => { e.preventDefault(); zeigeLeiste(); leiste.querySelector('button').focus(); });
+  });
+
+  // Ohne Zustimmung fragt jeder Film vor dem Abspielen nach (Zwei-Klick-Lösung). Die Zustimmung gilt danach für alle Filme.
+  if (typeof HTMLDialogElement === 'function') {
+    let frage = null;
+    let wartend = null;
+    document.addEventListener('click', (e) => {
+      const ziel = e.target.closest('[data-vimeo]');
+      if (!ziel || erlaubt('vimeo') || !eigenerKlick(e)) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (!frage) {
+        frage = document.createElement('dialog');
+        frage.className = 'einwilligung-film';
+        frage.setAttribute('aria-labelledby', 'film-frage-titel');
+        frage.innerHTML = '<h2 id="film-frage-titel">Film von Vimeo abspielen?</h2>'
+          + '<p>Der Film wird über Vimeo abgespielt. Dabei erhält Vimeo unter anderem Ihre IP-Adresse und kann Cookies setzen; Daten können in die USA übertragen werden. Ihre Zustimmung gilt für alle Filme auf dieser Seite und lässt sich jederzeit unten auf der Seite widerrufen. Mehr in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>'
+          + '<form method="dialog" class="einwilligung__knoepfe"><button class="btn btn--kompakt" value="ja">Abspielen</button><button class="btn btn--kompakt btn--linie" value="nein">Abbrechen</button></form>';
+        document.body.append(frage);
+        frage.addEventListener('close', () => {
+          const z = wartend;
+          wartend = null;
+          if (frage.returnValue !== 'ja' || !z) return;
+          speichereAuswahl({ ...(auswahl || {}), vimeo: true });
+          if (leiste) leiste.hidden = true;
+          z.click();
+        });
+      }
+      wartend = ziel;
+      frage.returnValue = '';
+      frage.showModal();
+    }, true);
+  }
 
   const jahr = document.querySelector('[data-jahr]');
   if (jahr) jahr.textContent = new Date().getFullYear();
